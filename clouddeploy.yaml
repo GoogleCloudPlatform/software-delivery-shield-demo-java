@@ -1,0 +1,29 @@
+apiVersion: deploy.cloud.google.com/v1
+kind: DeliveryPipeline
+metadata:
+ name: guestbook-app
+description: main application pipeline
+serialPipeline:
+ stages:
+ - targetId: dev-cluster
+   profiles: []
+ - targetId: prod-cluster
+   profiles: []
+---
+
+apiVersion: deploy.cloud.google.com/v1
+kind: Target
+metadata:
+ name: dev-cluster
+description: development cluster
+gke:
+ cluster: projects/secure-supply-chain/locations/us-west1/clusters/slsa-demo-dev
+---
+
+apiVersion: deploy.cloud.google.com/v1
+kind: Target
+metadata:
+ name: prod-cluster
+description: production cluster
+gke:
+ cluster: projects/secure-supply-chain/locations/us-west1/clusters/slsa-demo
