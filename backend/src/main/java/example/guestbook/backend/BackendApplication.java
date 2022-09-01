@@ -11,7 +11,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 public class BackendApplication {
 
     public static void main(String[] args) {
-        final String[] expectedVars = {"PORT", "GUESTBOOK_DB_ADDR"};
+        final String[] expectedVars = {"PORT"};
         for (String v : expectedVars) {
             String value = System.getenv(v);
             if (value == null) {

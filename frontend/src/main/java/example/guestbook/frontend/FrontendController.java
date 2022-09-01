@@ -20,7 +20,7 @@ import org.springframework.web.client.RestTemplate;
 @Controller
 public class FrontendController {
 
-    private String backendUri = String.format("http://%s/messages",
+    private String backendUri = String.format("https://%s/messages",
         System.getenv("GUESTBOOK_API_ADDR"));
 
     /**

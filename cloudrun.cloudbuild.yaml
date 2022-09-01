@@ -1,0 +1,45 @@
+steps:
+
+- name: 'gcr.io/cloud-builders/docker'
+  entrypoint: '/bin/bash'
+  dir: 'frontend'
+  args:
+    - '-c'
+    - |
+      docker build -t gcr.io/${PROJECT_ID}/frontend .
+      docker push gcr.io/${PROJECT_ID}/frontend
+
+- id: 'Build and Push Container Image'
+  name: 'gcr.io/cloud-builders/docker'
+  entrypoint: '/bin/bash'
+  dir: 'backend'
+  args:
+    - '-c'
+    - |
+      docker build -t gcr.io/${PROJECT_ID}/backend .
+      docker push gcr.io/${PROJECT_ID}/backend
+
+- id: 'Deploy to Cloud Run'
+  name: 'gcr.io/cloud-builders/gcloud:latest'
+  entrypoint: /bin/bash
+  args:
+  - '-c'
+  - |
+    gcloud run deploy backend \
+      --image gcr.io/${PROJECT_ID}/backend \
+      --allow-unauthenticated \
+      --region ${_REGION} 
+
+    echo $(gcloud run services describe backend \
+      --region ${_REGION} \
+      --format='value(status.url)') > _service_url
+
+    gcloud run deploy frontend \
+      --image gcr.io/${PROJECT_ID}/frontend \
+      --allow-unauthenticated \
+      --region ${_REGION} \
+      --set-env-vars GUESTBOOK_API_ADDR=$(cat _service_url)
+
+
+substitutions:
+  _REGION: us-central1
