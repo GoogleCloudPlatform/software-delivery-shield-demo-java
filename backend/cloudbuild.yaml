@@ -1,0 +1,35 @@
+steps:
+  - id: "Build Container Image"
+    name: "gcr.io/cloud-builders/docker"
+    entrypoint: "/bin/bash"
+    args:
+      - "-c"
+      - |
+        docker build -t us-central1-docker.pkg.dev/${PROJECT_ID}/containers/${_SERVICE}:${SHORT_SHA} .
+
+  - id: "Push Container Image"
+    name: "gcr.io/cloud-builders/docker"
+    entrypoint: "/bin/bash"
+    args:
+      - "-c"
+      - |
+        docker push us-central1-docker.pkg.dev/${PROJECT_ID}/containers/${_SERVICE}:${SHORT_SHA}
+
+# - id: 'Deploy to Cloud Run'
+#   name: 'us-central1-docker.pkg.dev/cloud-builders/gcloud:latest'
+#   entrypoint: /bin/bash
+#   args:
+#   - '-c'
+#   - |
+#     gcloud run deploy ${_SERVICE} \
+#       --image us-central1-docker.pkg.dev/${PROJECT_ID}/containers/${_SERVICE}:${SHORT_SHA} \
+#       --no-allow-unauthenticated \
+#       --region ${_REGION}
+
+images:
+  - us-central1-docker.pkg.dev/${PROJECT_ID}/containers/${_SERVICE}:${SHORT_SHA}
+
+substitutions:
+  _SERVICE: guestbook-backend
+  SHORT_SHA: manual
+  # _REGION: us-central1

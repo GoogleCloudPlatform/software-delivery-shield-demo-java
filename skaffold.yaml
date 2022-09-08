@@ -12,4 +12,3 @@ build:
 requires:
   - path: ./frontend
   - path: ./backend
-  

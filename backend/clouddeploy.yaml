@@ -1,29 +1,29 @@
 apiVersion: deploy.cloud.google.com/v1
 kind: DeliveryPipeline
 metadata:
- name: guestbook-app-delivery
+  name: guestbook-app-delivery
 description: main application pipeline
 serialPipeline:
- stages:
- - targetId: dev-cluster
-   profiles: []
- - targetId: prod-cluster
-   profiles: []
----
+  stages:
+    - targetId: dev-cluster
+      profiles: []
+    - targetId: prod-cluster
+      profiles: []
 
+---
 apiVersion: deploy.cloud.google.com/v1
 kind: Target
 metadata:
- name: dev-cluster
+  name: dev-cluster
 description: development cluster
 gke:
- cluster: projects/PROJECT_ID/locations/us-west1/clusters/DEV_CLUSTER
----
+  cluster: projects/PROJECT_ID/locations/us-west1/clusters/DEV_CLUSTER
 
+---
 apiVersion: deploy.cloud.google.com/v1
 kind: Target
 metadata:
- name: prod-cluster
+  name: prod-cluster
 description: production cluster
 gke:
- cluster: projects/PROJECT_ID/locations/us-west1/clusters/PROD_CLUSTER
+  cluster: projects/PROJECT_ID/locations/us-west1/clusters/PROD_CLUSTER
