@@ -1,16 +1,14 @@
 package example.guestbook.frontend;
 
-import org.springframework.cloud.gcp.data.firestore.Document;
-
-import com.google.cloud.firestore.annotation.DocumentId;
+// import com.google.cloud.firestore.annotation.DocumentId;
+// import com.google.cloud.spring.data.firestore.Document;
 
 /**
  * defines the data associated with a single guest book entry
  */
-@Document(collectionName = "guestbookEntries")
+// @Document(collectionName = "guestbookEntries")
 public class GuestBookEntry {
-    @DocumentId
-    private String id;
+    // @DocumentId String id;
     private String author;
     private String message;
     private long date;
@@ -40,6 +38,6 @@ public class GuestBookEntry {
     }
 
     public final String toString() {
-        return this.author + " " + this.message;
+        return String.format("Author=%s;Message=%s;Date=%s", this.author, this.message, this.date);
     }
 }

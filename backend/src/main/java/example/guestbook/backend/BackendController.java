@@ -1,56 +1,56 @@
+//  Copyright 2022 Google LLC
+//
+//  Licensed under the Apache License, Version 2.0 (the "License");
+//  you may not use this file except in compliance with the License.
+//  You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+//  Unless required by applicable law or agreed to in writing, software
+//  distributed under the License is distributed on an "AS IS" BASIS,
+//  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+//  See the License for the specific language governing permissions and
+//  limitations under the License.
+
 package example.guestbook.backend;
 
-import org.springframework.web.bind.annotation.RestController;
-
-import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
-
+import java.util.Comparator;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RestController;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cloud.gcp.data.firestore.FirestoreTemplate;
-import org.springframework.data.domain.Sort;
-
-import java.util.List;
-
-/**
- * defines the REST endpoints managed by the server.
- */
+/** defines the REST endpoints managed by the server. */
 @RestController
 public class BackendController {
 
-    @Autowired private MessageRepository repository;
-    // private final MessageRepository repository;
-    // private final FirestoreTemplate firestoreTemplate;
+  @Autowired private MessageRepository repository;
 
-    // public BackendController(MessageRepository repository, FirestoreTemplate firestoreTemplate) {
-    //     this.repository = repository;
-    //     this.firestoreTemplate = firestoreTemplate;
-    // }
+  /**
+   * endpoint for retrieving all guest book entries stored in database
+   *
+   * @return a list of GuestBookEntry objects
+   */
+  @GetMapping("/messages")
+  public final Flux<GuestBookEntry> getMessages() {
+    Flux<GuestBookEntry> msgList = this.repository.findAll();
 
-    /**
-     * endpoint for retrieving all guest book entries stored in database
-     * @return a list of GuestBookEntry objects
-     */
-    @GetMapping("/messages")
-    public final Flux<GuestBookEntry> getMessages() {
-        Sort byCreation = Sort.by(Sort.Direction.DESC, "_id");
-        Flux<GuestBookEntry> msgList = this.repository.findAll();
-        // System.out.println(this.firestoreTemplate.findAll(GuestBookEntry.class));
-        return msgList;
-    }
+    return msgList.sort(Comparator.comparing(GuestBookEntry::getDate).reversed());
+  }
 
-    /**
-     * endpoint for adding a new guest book entry to the database
-     * @param message a message object passed in the HTTP POST request
-     * @return 
-     */
-    @PostMapping("/messages")
-    public final Mono<GuestBookEntry> addMessage(@RequestBody GuestBookEntry message) {
-        System.out.println(message.toString());
-        message.setDate(System.currentTimeMillis());
-        return this.repository.save(message);
-    }
+  /**
+   * endpoint for adding a new guest book entry to the database
+   *
+   * @param message a message object passed in the HTTP POST request
+   * @return
+   */
+  @PostMapping("/messages")
+  public final Mono<GuestBookEntry> addMessage(@RequestBody GuestBookEntry message) {
+    System.out.println(message.toString());
+    message.setDate(System.currentTimeMillis());
+    return this.repository.save(message);
+  }
 }

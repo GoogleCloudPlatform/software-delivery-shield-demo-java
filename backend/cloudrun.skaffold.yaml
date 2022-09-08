@@ -1,0 +1,17 @@
+apiVersion: skaffold/v3alpha1
+kind: Config
+metadata:
+  name: backend
+profiles:
+  - name: dev
+    manifests:
+      rawYaml:
+        - ./cloudrun-manifests/guestbook-backend.dev.service.yaml
+  - name: prod
+    manifests:
+      rawYaml:
+        - ./cloudrun-manifests/guestbook-backend.prod.service.yaml
+deploy:
+  cloudrun:
+    projectid: unused
+    region: unused
