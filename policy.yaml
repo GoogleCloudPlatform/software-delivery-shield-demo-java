@@ -1,0 +1,6 @@
+defaultAdmissionRule:
+  evaluationMode: REQUIRE_ATTESTATION
+  enforcementMode: ENFORCED_BLOCK_AND_AUDIT_LOG
+  requireAttestationsBy:
+    - projects/starter-akitsch/attestors/built-by-cloud-build
+name: projects/starter-akitsch/policy

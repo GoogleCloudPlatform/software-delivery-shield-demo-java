@@ -1,22 +1,36 @@
 steps:
-  - name: "gcr.io/cloud-builders/docker"
-    entrypoint: "/bin/bash"
-    dir: "frontend"
+  - id: "Build and Push Container Frontend and Backend Images"
+    name: 'gcr.io/k8s-skaffold/skaffold'
+    entrypoint: /bin/bash
     args:
-      - "-c"
-      - |
-        docker build -t us-central1-docker.pkg.dev/${PROJECT_ID}/containers/frontend:${SHORT_SHA} .
-        docker push us-central1-docker.pkg.dev/${PROJECT_ID}/containers/frontend:${SHORT_SHA}
+    - "-xe"
+    - "-c"
+    - |
+      skaffold build --file-output=./artifacts.json \
+        --default-repo=${_REGION}-docker.pkg.dev/${PROJECT_ID}/containers \
+        --tag=${SHORT_SHA} \
+        --profile=dockerfile \
+        --push=true
+  
+  # - id: "Build and Push Container Image: Frontend"
+  #   name: "gcr.io/cloud-builders/docker"
+  #   entrypoint: "/bin/bash"
+  #   dir: "frontend"
+  #   args:
+  #     - "-c"
+  #     - |
+  #       docker build -t $_FRONTEND_IMAGE .
+  #       docker push $_FRONTEND_IMAGE
 
-  - id: "Build and Push Container Image"
-    name: "gcr.io/cloud-builders/docker"
-    entrypoint: "/bin/bash"
-    dir: "backend"
-    args:
-      - "-c"
-      - |
-        docker build -t us-central1-docker.pkg.dev/${PROJECT_ID}/containers/backend:${SHORT_SHA} .
-        docker push us-central1-docker.pkg.dev/${PROJECT_ID}/containers/backend:${SHORT_SHA}
+  # - id: "Build and Push Container Image: Backend"
+  #   name: "gcr.io/cloud-builders/docker"
+  #   entrypoint: "/bin/bash"
+  #   dir: "backend"
+  #   args:
+  #     - "-c"
+  #     - |
+  #       docker build -t $_BACKEND_IMAGE .
+  #       docker push $_BACKEND_IMAGE
 
   - id: "Deploy to Cloud Run"
     name: "gcr.io/cloud-builders/gcloud:latest"
@@ -24,24 +38,45 @@ steps:
     args:
       - "-c"
       - |
-        gcloud run deploy backend \
-          --image us-central1-docker.pkg.dev/${PROJECT_ID}/containers/backend:${SHORT_SHA} \
-          --allow-unauthenticated \
-          --region ${_REGION} 
+        gcloud deploy releases create backend-release \
+          --delivery-pipeline=cloudrun-guestbook-app-delivery \
+          --skaffold-file=./backend/cloudrun.skaffold.yaml \
+          --images=java-guestbook-backend=$BACKEND
 
-        echo $(gcloud run services describe backend \
-          --region ${_REGION} \
-          --format='value(status.url)') > _service_url
+        gcloud deploy releases create frontend-release \
+          --delivery-pipeline=cloudrun-guestbook-app-delivery \
+          --skaffold-file=./frontend/cloudrun.skaffold.yaml \
+          --images=java-guestbook-frontend=$FRONTEND
 
-        gcloud run deploy frontend \
-          --image us-central1-docker.pkg.dev/${PROJECT_ID}/containers/frontend:${SHORT_SHA} \
-          --allow-unauthenticated \
-          --region ${_REGION} \
-          --set-env-vars GUESTBOOK_API_ADDR=$(cat _service_url)
+
+  # - id: "Deploy to Cloud Run"
+  #   name: "gcr.io/cloud-builders/gcloud:latest"
+  #   entrypoint: /bin/bash
+  #   args:
+  #     - "-c"
+  #     - |
+  #       # gcloud run deploy backend \
+  #       #   --image us-central1-docker.pkg.dev/${PROJECT_ID}/containers/backend:${SHORT_SHA} \
+  #       #   --allow-unauthenticated \
+  #       #   --region ${_REGION} 
+
+  #       # echo $(gcloud run services describe backend \
+  #       #   --region ${_REGION} \
+  #       #   --format='value(status.url)') > _service_url
+
+  #       # gcloud run deploy frontend \
+  #       #   --image us-central1-docker.pkg.dev/${PROJECT_ID}/containers/frontend:${SHORT_SHA} \
+  #       #   --allow-unauthenticated \
+  #       #   --region ${_REGION} \
+  #       #   --set-env-vars GUESTBOOK_API_ADDR=$(cat _service_url)
 
 images:
-  - us-central1-docker.pkg.dev/${PROJECT_ID}/containers/frontend:${SHORT_SHA}
-  - us-central1-docker.pkg.dev/${PROJECT_ID}/containers/backend:${SHORT_SHA}
+  - $_FRONTEND_IMAGE
+  - $_BACKEND_IMAGE
+
 substitutions:
+  _FRONTEND_IMAGE: 'us-central1-docker.pkg.dev/${PROJECT_ID}/containers/java-guestbook-frontend:${SHORT_SHA}'
+  _BACKEND_IMAGE: 'us-central1-docker.pkg.dev/${PROJECT_ID}/containers/java-guestbook-backend:${SHORT_SHA}'
   _REGION: us-central1
-# gcloud builds submit --config cloudrun.cloudbuild.yaml --substitutions SHORT_SHA=1
+options:
+    dynamic_substitutions: true

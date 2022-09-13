@@ -14,6 +14,21 @@
     <module>backend</module>
   </modules>
 
+  <!-- <repositories>
+    <repository>
+      <id>central</id>
+      <name>Maven Central remote repository</name>
+      <url>artifactregistry://us-central1-maven.pkg.dev/starter-akitsch/guestbook-remote-repo</url>
+      <layout>default</layout>
+      <releases>
+        <enabled>true</enabled>
+      </releases>
+      <snapshots>
+        <enabled>true</enabled>
+      </snapshots>
+    </repository>
+  </repositories> -->
+
   <build>
     <pluginManagement>
       <plugins>
@@ -24,6 +39,13 @@
         </plugin>
       </plugins>
     </pluginManagement>
+    <!-- <extensions>
+      <extension>
+        <groupId>com.google.cloud.artifactregistry</groupId>
+        <artifactId>artifactregistry-maven-wagon</artifactId>
+        <version>2.1.5</version>
+      </extension>
+    </extensions> -->
   </build>
 
 </project>
