@@ -79,7 +79,7 @@ substitutions:
   _REGION: us-central1
 # artifacts:
 #   maven_artifacts:
-#     - repository: "https://us-central1-maven.pkg.dev/starter-akitsch/guestbook-remote-repo"
+#     - repository: "https://us-central1-maven.pkg.dev/PROJECT_ID/guestbook-remote-repo"
 #       path: "/workspace/appengine-simple-jetty-main/target/simple-jetty-main-1.jar"
 #       artifact_id: "simple-jetty-main"
 #       group_id: "com.example.appengine.demo"

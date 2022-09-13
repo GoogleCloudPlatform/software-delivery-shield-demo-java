@@ -25,7 +25,7 @@
     <repository>
       <id>central</id>
       <name>Maven Central remote repository</name>
-      <url>artifactregistry://us-central1-maven.pkg.dev/starter-akitsch/guestbook-remote-repo</url>
+      <url>artifactregistry://us-central1-maven.pkg.dev/PROJECT_ID/guestbook-remote-repo</url>
       <layout>default</layout>
       <releases>
         <enabled>true</enabled>
