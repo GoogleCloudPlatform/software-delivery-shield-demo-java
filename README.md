@@ -35,29 +35,30 @@ The Guestbook sample demonstrates how to deploy a Kubernetes application with a 
 ## GKE Instructions
 
 ### Before you begin
-  1. Enable APIs: 
-    * Artifact Registry, Container Analysis, and Binary Authorization APIs.
+  1. Enable APIs  
+      * Artifact Registry, Container Analysis, and Binary Authorization APIs.
 
   2. Download **Cloud Code Source Protect plugin**
 
   3. Set permissions
-    * TBD
+      * TBD
 
   4. Set **Binary Authorization** Policy (need to run a build first for Cloud Build attestor to be present)
-    ```
-    gcloud container binauthz policy import policy.yaml
-    ```
+      ```
+      gcloud container binauthz policy import policy.yaml
+      ```
 
   5. Set config for gcloud
-    ```
-    gcloud config set deploy/region us-central1
-    gcloud config set project <PROJECT_ID>
-    ``` 
+      ```
+      gcloud config set deploy/region us-central1
+      gcloud config set project <PROJECT_ID>
+      ``` 
 
 ### Setup
 
-  #### Remote repo
-    1. Create an **Artifact Registry Remote Repository** ([https://cloud.google.com/artifact-registry/docs/repositories/remote-repo](https://cloud.google.com/artifact-registry/docs/repositories/remote-repo) )
+#### Remote repo
+
+  1. Create an **Artifact Registry Remote Repository** ([https://cloud.google.com/artifact-registry/docs/repositories/remote-repo](https://cloud.google.com/artifact-registry/docs/repositories/remote-repo) )
       ```
       gcloud artifacts repositories create guestbook-remote-repo \
           --repository-format=maven \
@@ -68,21 +69,22 @@ The Guestbook sample demonstrates how to deploy a Kubernetes application with a 
           --remote-mvn-repo=MAVEN-CENTRAL
       ```
 
-    2. Download dependencies
+  2. Download dependencies
 
       ```
       mvn compile
       ```
 
-    3. View cached dependencies
+  3. View cached dependencies
       ```
       gcloud artifacts files list \
           --repository=guestbook-remote-repo \
           --location=us-central1
       ```
 
-    4. Create clusters with **Binary Authorization** enabled
+#### GKE Cluster
 
+  4. Create clusters with **Binary Authorization** enabled
       ```
       gcloud container clusters create-auto dev-cluster --region=us-central1 --binauthz-evaluation-mode=PROJECT_SINGLETON_POLICY_ENFORCE
       && \
@@ -90,12 +92,12 @@ The Guestbook sample demonstrates how to deploy a Kubernetes application with a 
       ```
 
 ### Retrieve the code
-    1. Clone repo
+  1. Clone repo
       ```
       git clone
       ```
 
-    2. Change directory
+  2. Change directory
       ```
       cd guestbook-demo
       ```
@@ -105,28 +107,28 @@ The Guestbook sample demonstrates how to deploy a Kubernetes application with a 
 
 ### Deploy
   1. Create your Cloud Deploy delivery pipeline and targets:
-    * Edit clouddeploy.yaml with your PROJECT_ID
-    * Register pipeline
-      ```
-      gcloud deploy apply --file clouddeploy.yaml
-      ```
+      * Edit clouddeploy.yaml with your PROJECT_ID
+      * Register pipeline
+        ```
+        gcloud deploy apply --file clouddeploy.yaml
+        ```
 
   2. Run Cloud Build to do the following:
-    * Build and push containers to Artifact Registry with provenance
-    * Builds and deploys Java artifacts in AR ([https://cloud.google.com/artifact-registry/docs/java/manage-packages](https://cloud.google.com/artifact-registry/docs/java/manage-packages) ) with provenance
-    * Automatically signs with attestor “built-with-cloud-build”
-    * Create a release via **Cloud Deploy**
-      ```
-      gcloud builds submit --config cloudbuild.yaml --substitution SHORT_SHA=1234
-      ```
+      * Build and push containers to Artifact Registry with provenance
+      * Builds and deploys Java artifacts in AR ([https://cloud.google.com/artifact-registry/docs/java/manage-packages](https://cloud.google.com/artifact-registry/docs/java/manage-packages) ) with provenance
+      * Automatically signs with attestor “built-with-cloud-build”
+      * Create a release via **Cloud Deploy**
+        ```
+        gcloud builds submit --config cloudbuild.yaml --substitution SHORT_SHA=1234
+        ```
   3. Promote the release via the Cloud Deploy UI
 
 ### View Software Delivery Shield features
   1. Open **Cloud Build SDS panel** (Cloud Build UI > Build Artifacts > View Security Insights)
-    * View SLSA level, provenance, and **Java packages/SBOM**
-    * Click "Artifacts Scanned" to view vulnerabilities in Artifact Registry
-    * Or Use gcloud (UI and gcloud seem to have different info!)
-    * (Optional) Verify provenance: [https://cloud.google.com/build/docs/securing-builds/view-build-provenance](https://cloud.google.com/build/docs/securing-builds/view-build-provenance) 
+      * View SLSA level, provenance, and **Java packages/SBOM**
+      * Click "Artifacts Scanned" to view vulnerabilities in Artifact Registry
+      * Or Use gcloud (UI and gcloud seem to have different info!)
+      * (Optional) Verify provenance: [https://cloud.google.com/build/docs/securing-builds/view-build-provenance](https://cloud.google.com/build/docs/securing-builds/view-build-provenance) 
 
   2. View **GKE Security Postures** UI
 
