@@ -20,4 +20,4 @@ spec:
   template:
     spec:
       containers:
-      - image: java-guestbook-backend
+        - image: java-guestbook-backend

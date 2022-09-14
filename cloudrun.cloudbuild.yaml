@@ -51,14 +51,15 @@ steps:
     entrypoint: /bin/bash
     args:
       - "-c"
+      - "-x"
       - |
         gcloud run deploy guestbook-backend-dev --image gcr.io/cloudrun/hello --region us-central1
         gcloud run deploy guestbook-backend-prod --image gcr.io/cloudrun/hello --region us-central1
         dev_url=$(gcloud run services describe guestbook-backend-dev --region us-central1 --format='value(status.url)')
         prod_url=$(gcloud run services describe guestbook-backend-prod --region us-central1 --format='value(status.url)')
 
-        sed -i 's/BACKEND_DEV/$dev_url/g' ./frontend/cloudrun-manifests/guestbook-frontend.dev.service.yaml
-        sed -i 's/BACKEND_PROD/$prod_url/g' ./frontend/cloudrun-manifests/guestbook-frontend.prod.service.yaml
+        sed -i "s|BACKEND_DEV|$dev_url|" ./frontend/cloudrun-manifests/guestbook-frontend.dev.service.yaml
+        sed -i "s|BACKEND_PROD|$prod_url|" ./frontend/cloudrun-manifests/guestbook-frontend.prod.service.yaml
 
         gcloud deploy releases create backend-release-${SHORT_SHA} \
           --region $_REGION \

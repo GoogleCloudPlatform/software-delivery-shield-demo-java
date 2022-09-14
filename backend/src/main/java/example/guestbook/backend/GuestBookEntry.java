@@ -16,40 +16,48 @@ package example.guestbook.backend;
 
 import com.google.cloud.firestore.annotation.DocumentId;
 import com.google.cloud.spring.data.firestore.Document;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
 
 /** defines the data associated with a single guest book entry */
-@Document(collectionName = "guestbookEntries")
+// @Document(collectionName = "guestbookEntries")
+@Entity
 public class GuestBookEntry {
-  @DocumentId String id;
+  // @DocumentId String id;
+  @Id
+  @GeneratedValue(strategy = GenerationType.AUTO)
+  private Long id;
   private String author;
   private String message;
   private long date;
 
-  public final String getAuthor() {
+  public String getAuthor() {
     return author;
   }
 
-  public final void setAuthor(String author) {
+  public void setAuthor(String author) {
     this.author = author;
   }
 
-  public final String getMessage() {
+  public String getMessage() {
     return message;
   }
 
-  public final void setMessage(String message) {
+  public void setMessage(String message) {
     this.message = message;
   }
 
-  public final long getDate() {
+  public long getDate() {
     return this.date;
   }
 
-  public final void setDate(long date) {
+  public void setDate(long date) {
     this.date = date;
   }
 
-  public final String toString() {
+  public String toString() {
     return String.format("Author=%s;Message=%s;Date=%s", this.author, this.message, this.date);
   }
 }

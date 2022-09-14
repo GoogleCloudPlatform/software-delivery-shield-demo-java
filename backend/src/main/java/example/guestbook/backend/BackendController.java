@@ -15,6 +15,8 @@
 package example.guestbook.backend;
 
 import java.util.Comparator;
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -27,7 +29,7 @@ import reactor.core.publisher.Mono;
 @RestController
 public class BackendController {
 
-  @Autowired private MessageRepository repository;
+  @Autowired MessageRepository repository;
 
   /**
    * endpoint for retrieving all guest book entries stored in database
@@ -35,10 +37,10 @@ public class BackendController {
    * @return a list of GuestBookEntry objects
    */
   @GetMapping("/messages")
-  public final Flux<GuestBookEntry> getMessages() {
-    Flux<GuestBookEntry> msgList = this.repository.findAll();
+  public final Iterable<GuestBookEntry> getMessages() {
+    Iterable<GuestBookEntry> msgList = this.repository.findAll();
 
-    return msgList.sort(Comparator.comparing(GuestBookEntry::getDate).reversed());
+    return msgList;//.sort(Comparator.comparing(GuestBookEntry::getDate).reversed());
   }
 
   /**
@@ -48,7 +50,7 @@ public class BackendController {
    * @return
    */
   @PostMapping("/messages")
-  public final Mono<GuestBookEntry> addMessage(@RequestBody GuestBookEntry message) {
+  public final GuestBookEntry addMessage(@RequestBody GuestBookEntry message) {
     System.out.println(message.toString());
     message.setDate(System.currentTimeMillis());
     return this.repository.save(message);
