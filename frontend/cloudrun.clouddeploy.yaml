@@ -4,7 +4,7 @@
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
 #
-#      http://www.apache.org/licenses/LICENSE-2.0
+#     https://www.apache.org/licenses/LICENSE-2.0
 #
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
@@ -15,29 +15,29 @@
 apiVersion: deploy.cloud.google.com/v1
 kind: DeliveryPipeline
 metadata:
-  name: guestbook-app-delivery
+ name: cloudrun-guestbook-frontend-delivery
 description: main application pipeline
 serialPipeline:
-  stages:
-    - targetId: dev-cluster
-      profiles: []
-    - targetId: prod-cluster
-      profiles: []
-
+ stages:
+ - targetId: cloudrun-dev
+   profiles: [dev]
+ - targetId: cloudrun-prod
+   profiles: [prod]
 ---
+
 apiVersion: deploy.cloud.google.com/v1
 kind: Target
 metadata:
-  name: dev-cluster
-description: development cluster
-gke:
-  cluster: projects/PROJECT_ID/locations/us-central1/clusters/dev-cluster
-
+ name: cloudrun-dev
+description: Cloud Run development service
+run:
+ location: projects/PROJECT_ID/locations/us-central1
 ---
+
 apiVersion: deploy.cloud.google.com/v1
 kind: Target
 metadata:
-  name: prod-cluster
-description: production cluster
-gke:
-  cluster: projects/PROJECT_ID/locations/us-central1/clusters/prod-cluster
+ name: cloudrun-prod
+description: Cloud Run production service
+run:
+ location: projects/PROJECT_ID/locations/us-central1

@@ -1,3 +1,17 @@
+# Copyright 2022 Google LLC
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
 steps:
   - id: "Build and Push Container Frontend and Backend Images"
     name: 'gcr.io/k8s-skaffold/skaffold'
@@ -7,7 +21,7 @@ steps:
     - "-c"
     - |
       skaffold build --file-output=./artifacts.json \
-        --default-repo=${_REGION}-docker.pkg.dev/${PROJECT_ID}/containers \
+        --default-repo=$_IMAGE_REPO \
         --tag=${SHORT_SHA} \
         --profile=dockerfile \
         --push=true
@@ -38,15 +52,25 @@ steps:
     args:
       - "-c"
       - |
-        gcloud deploy releases create backend-release \
-          --delivery-pipeline=cloudrun-guestbook-app-delivery \
-          --skaffold-file=./backend/cloudrun.skaffold.yaml \
-          --images=java-guestbook-backend=$BACKEND
+        gcloud run deploy guestbook-backend-dev --image gcr.io/cloudrun/hello --region us-central1
+        gcloud run deploy guestbook-backend-prod --image gcr.io/cloudrun/hello --region us-central1
+        dev_url=$(gcloud run services describe guestbook-backend-dev --region us-central1 --format='value(status.url)')
+        prod_url=$(gcloud run services describe guestbook-backend-prod --region us-central1 --format='value(status.url)')
 
-        gcloud deploy releases create frontend-release \
-          --delivery-pipeline=cloudrun-guestbook-app-delivery \
+        sed -i 's/BACKEND_DEV/$dev_url/g' ./frontend/cloudrun-manifests/guestbook-frontend.dev.service.yaml
+        sed -i 's/BACKEND_PROD/$prod_url/g' ./frontend/cloudrun-manifests/guestbook-frontend.prod.service.yaml
+
+        gcloud deploy releases create backend-release-${SHORT_SHA} \
+          --region $_REGION \
+          --delivery-pipeline=cloudrun-guestbook-backend-delivery \
+          --skaffold-file=./backend/cloudrun.skaffold.yaml \
+          --images=java-guestbook-backend=$_BACKEND_IMAGE
+
+        gcloud deploy releases create frontend-release-${SHORT_SHA} \
+          --region $_REGION \
+          --delivery-pipeline=cloudrun-guestbook-frontend-delivery \
           --skaffold-file=./frontend/cloudrun.skaffold.yaml \
-          --images=java-guestbook-frontend=$FRONTEND
+          --images=java-guestbook-frontend=$_FRONTEND_IMAGE
 
 
   # - id: "Deploy to Cloud Run"
@@ -75,6 +99,7 @@ images:
   - $_BACKEND_IMAGE
 
 substitutions:
+  _IMAGE_REPO: 'us-central1-docker.pkg.dev/${PROJECT_ID}/containers'
   _FRONTEND_IMAGE: 'us-central1-docker.pkg.dev/${PROJECT_ID}/containers/java-guestbook-frontend:${SHORT_SHA}'
   _BACKEND_IMAGE: 'us-central1-docker.pkg.dev/${PROJECT_ID}/containers/java-guestbook-backend:${SHORT_SHA}'
   _REGION: us-central1

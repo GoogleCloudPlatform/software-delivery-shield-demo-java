@@ -22,10 +22,6 @@ WORKDIR /app
 # copy the pom.xml file to download dependencies
 COPY pom.xml ./
 
-# download dependencies as specified in pom.xml
-# building dependency layer early will speed up compile time when pom is unchanged
-# RUN mvn verify --fail-never
-
 # Copy the rest of the working directory contents into the container
 COPY . ./
 

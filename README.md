@@ -56,7 +56,13 @@ The Guestbook sample demonstrates how to deploy a Kubernetes application with a 
 
 ### Setup
 
-#### Remote repo
+#### Artifact Registry repos
+  1. Create an **Artifact Registry Docker Repository**
+      ```
+      gcloud artifacts repositories create containers \
+          --repository-format=docker \
+          --description="Docker repository"
+      ```
 
   1. Create an **Artifact Registry Remote Repository** ([https://cloud.google.com/artifact-registry/docs/repositories/remote-repo](https://cloud.google.com/artifact-registry/docs/repositories/remote-repo) )
       ```
