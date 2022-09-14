@@ -15,7 +15,6 @@
 steps:
   # - id: "Build Maven Artifact with Provenance"
   #   name: gcr.io/cloud-builders/mvn
-  #   dir: ??
   #   args: ['deploy']
 
   # - id: "Cache Maven dependencies in a remote AR repo"
@@ -62,15 +61,12 @@ steps:
       - "-xe"
       - "-c"
       - |
-        # TODO: check if pipeline exists or if release already exists
         frontend_sha=$(gcloud artifacts docker images describe $_FRONTEND_IMAGE:${SHORT_SHA} --format="value(image_summary.digest)")
         backend_sha=$(gcloud artifacts docker images describe $_BACKEND_IMAGE:${SHORT_SHA} --format="value(image_summary.digest)")
         gcloud deploy releases create release-${SHORT_SHA} \
           --region $_REGION \
           --delivery-pipeline=guestbook-app-delivery \
           --images=java-guestbook-frontend=${_FRONTEND_IMAGE}@$frontend_sha,java-guestbook-backend=${_BACKEND_IMAGE}@$backend_sha
-#           --description "$(git log -1  --pretty='%s')" \
-#           --build-artifacts /workspace/artifacts.json \
 
 images:
   - $_FRONTEND_IMAGE:${SHORT_SHA}
@@ -81,13 +77,6 @@ substitutions:
   _FRONTEND_IMAGE: 'us-central1-docker.pkg.dev/${PROJECT_ID}/containers/java-guestbook-frontend'
   _BACKEND_IMAGE: 'us-central1-docker.pkg.dev/${PROJECT_ID}/containers/java-guestbook-backend'
   _REGION: us-central1
-# artifacts:
-#   maven_artifacts:
-#     - repository: "https://us-central1-maven.pkg.dev/{PROJECT_ID}/guestbook-remote-repo"
-#       path: "/workspace/appengine-simple-jetty-main/target/simple-jetty-main-1.jar"
-#       artifact_id: "simple-jetty-main"
-#       group_id: "com.example.appengine.demo"
-#       version: "1"
 
 options:
     dynamic_substitutions: true

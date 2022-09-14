@@ -14,16 +14,11 @@
 
 package example.guestbook.backend;
 
-import java.util.Comparator;
-import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
-import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
 
 /** defines the REST endpoints managed by the server. */
 @RestController
@@ -40,7 +35,7 @@ public class BackendController {
   public final Iterable<GuestBookEntry> getMessages() {
     Iterable<GuestBookEntry> msgList = this.repository.findAll();
 
-    return msgList;//.sort(Comparator.comparing(GuestBookEntry::getDate).reversed());
+    return msgList;
   }
 
   /**

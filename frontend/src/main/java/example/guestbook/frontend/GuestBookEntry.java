@@ -14,15 +14,10 @@
 
 package example.guestbook.frontend;
 
-// import com.google.cloud.firestore.annotation.DocumentId;
-// import com.google.cloud.spring.data.firestore.Document;
-
 /**
  * defines the data associated with a single guest book entry
  */
-// @Document(collectionName = "guestbookEntries")
 public class GuestBookEntry {
-    // @DocumentId String id;
     private String author;
     private String message;
     private long date;

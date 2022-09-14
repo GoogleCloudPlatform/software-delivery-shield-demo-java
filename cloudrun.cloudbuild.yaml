@@ -80,20 +80,20 @@ steps:
   #   args:
   #     - "-c"
   #     - |
-  #       # gcloud run deploy backend \
-  #       #   --image us-central1-docker.pkg.dev/${PROJECT_ID}/containers/backend:${SHORT_SHA} \
-  #       #   --allow-unauthenticated \
-  #       #   --region ${_REGION} 
+  #       gcloud run deploy backend \
+  #         --image us-central1-docker.pkg.dev/${PROJECT_ID}/containers/backend:${SHORT_SHA} \
+  #         --allow-unauthenticated \
+  #         --region ${_REGION} 
 
-  #       # echo $(gcloud run services describe backend \
-  #       #   --region ${_REGION} \
-  #       #   --format='value(status.url)') > _service_url
+  #       echo $(gcloud run services describe backend \
+  #         --region ${_REGION} \
+  #         --format='value(status.url)') > _service_url
 
-  #       # gcloud run deploy frontend \
-  #       #   --image us-central1-docker.pkg.dev/${PROJECT_ID}/containers/frontend:${SHORT_SHA} \
-  #       #   --allow-unauthenticated \
-  #       #   --region ${_REGION} \
-  #       #   --set-env-vars GUESTBOOK_API_ADDR=$(cat _service_url)
+  #       gcloud run deploy frontend \
+  #         --image us-central1-docker.pkg.dev/${PROJECT_ID}/containers/frontend:${SHORT_SHA} \
+  #         --allow-unauthenticated \
+  #         --region ${_REGION} \
+  #         --set-env-vars GUESTBOOK_API_ADDR=$(cat _service_url)
 
 images:
   - $_FRONTEND_IMAGE

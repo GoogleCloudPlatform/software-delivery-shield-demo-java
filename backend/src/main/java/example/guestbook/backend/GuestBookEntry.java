@@ -14,18 +14,14 @@
 
 package example.guestbook.backend;
 
-import com.google.cloud.firestore.annotation.DocumentId;
-import com.google.cloud.spring.data.firestore.Document;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 
 /** defines the data associated with a single guest book entry */
-// @Document(collectionName = "guestbookEntries")
 @Entity
 public class GuestBookEntry {
-  // @DocumentId String id;
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)
   private Long id;

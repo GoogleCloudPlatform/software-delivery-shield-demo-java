@@ -14,12 +14,12 @@
 
 package example.guestbook.backend;
 
-import com.google.cloud.spring.data.firestore.FirestoreReactiveRepository;
+// import com.google.cloud.spring.data.firestore.FirestoreReactiveRepository;
 
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
-/** Firestore repository that stores GuestBookEntry objects */
+/** Repository that stores GuestBookEntry objects */
 @Repository
 public interface MessageRepository extends CrudRepository<GuestBookEntry, Long> {}
 // public interface MessageRepository extends FirestoreReactiveRepository<GuestBookEntry> {}
