@@ -12,47 +12,42 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+# This file is used in the full demo for the deployment of the Frontend and
+# Backend services to GKE via Cloud Deploy
+
 steps:
-  # - id: "Build Maven Artifact with Provenance"
-  #   name: gcr.io/cloud-builders/mvn
-  #   args: ['deploy']
+  - id: "Cache Maven Dependencies in an Artifact Registry Remote Repo"
+    name: gcr.io/cloud-builders/mvn
+    args: ["compile"]
 
-  # - id: "Cache Maven dependencies in a remote AR repo"
-  #   name: gcr.io/cloud-builders/mvn
-  #   args: ["compile"]
-
-  - id: "Build and Push Container Frontend and Backend Images"
-    name: 'gcr.io/k8s-skaffold/skaffold'
+  - id: "Build Maven Artifact with Provenance"
+    name: "gcr.io/cloud-builders/mvn"
+    dir: "guestbook-pojo"
     entrypoint: /bin/bash
     args:
-    - "-xe"
     - "-c"
     - |
-      skaffold build --file-output=./artifacts.json \
-        --default-repo=$_IMAGE_REPO \
-        --tag=${SHORT_SHA} \
-        --profile=dockerfile \
-        --push=true
+      mvn deploy || echo "Artifact may already exist"
 
-  # - id: "Build and Push Container Image: Frontend"
-  #   name: "gcr.io/cloud-builders/docker"
-  #   entrypoint: "/bin/bash"
-  #   dir: "frontend"
-  #   args:
-  #     - "-c"
-  #     - |
-  #       docker build -t $_FRONTEND_IMAGE .
-  #       docker push $_FRONTEND_IMAGE
+  - id: "Build and Push Container Image: Frontend"
+    name: "gcr.io/cloud-builders/docker"
+    entrypoint: "/bin/bash"
+    dir: "frontend"
+    args:
+      - "-c"
+      - |
+        docker build --network=cloudbuild -t $_FRONTEND_IMAGE:$SHORT_SHA . 
+        docker push $_FRONTEND_IMAGE:$SHORT_SHA
 
-  # - id: "Build and Push Container Image: Backend"
-  #   name: "gcr.io/cloud-builders/docker"
-  #   entrypoint: "/bin/bash"
-  #   dir: "backend"
-  #   args:
-  #     - "-c"
-  #     - |
-  #       docker build -t $_BACKEND_IMAGE .
-  #       docker push $_BACKEND_IMAGE
+  - id: "Build and Push Container Image: Backend"
+    name: "gcr.io/cloud-builders/docker"
+    entrypoint: "/bin/bash"
+    dir: "backend"
+    args:
+      - "-c"
+      - |
+        docker build --network=cloudbuild -t $_BACKEND_IMAGE:$SHORT_SHA .
+        docker push $_BACKEND_IMAGE:$SHORT_SHA
 
   - id: "Create Cloud Deploy Release"
     name: "gcr.io/cloud-builders/gcloud:latest"
@@ -61,19 +56,21 @@ steps:
       - "-xe"
       - "-c"
       - |
-        frontend_sha=$(gcloud artifacts docker images describe $_FRONTEND_IMAGE:${SHORT_SHA} --format="value(image_summary.digest)")
-        backend_sha=$(gcloud artifacts docker images describe $_BACKEND_IMAGE:${SHORT_SHA} --format="value(image_summary.digest)")
+        # Retrieve image SHAs
+        frontend_sha=$(gcloud artifacts docker images describe $_FRONTEND_IMAGE:$SHORT_SHA --format="value(image_summary.digest)")
+        backend_sha=$(gcloud artifacts docker images describe $_BACKEND_IMAGE:$SHORT_SHA --format="value(image_summary.digest)")
+
+        # Create Cloud Deploy release with new images
         gcloud deploy releases create release-${SHORT_SHA} \
           --region $_REGION \
           --delivery-pipeline=guestbook-app-delivery \
           --images=java-guestbook-frontend=${_FRONTEND_IMAGE}@$frontend_sha,java-guestbook-backend=${_BACKEND_IMAGE}@$backend_sha
 
 images:
-  - $_FRONTEND_IMAGE:${SHORT_SHA}
-  - $_BACKEND_IMAGE:${SHORT_SHA}
+  - $_FRONTEND_IMAGE:$SHORT_SHA
+  - $_BACKEND_IMAGE:$SHORT_SHA
 
 substitutions:
-  _IMAGE_REPO: 'us-central1-docker.pkg.dev/${PROJECT_ID}/containers'
   _FRONTEND_IMAGE: 'us-central1-docker.pkg.dev/${PROJECT_ID}/containers/java-guestbook-frontend'
   _BACKEND_IMAGE: 'us-central1-docker.pkg.dev/${PROJECT_ID}/containers/java-guestbook-backend'
   _REGION: us-central1

@@ -3,33 +3,78 @@
     xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
+  <groupId>com.example.guestbook</groupId>
   <artifactId>frontend</artifactId>
   <packaging>jar</packaging>
   <name>Guestbook Frontend</name>
-  <description>Guestbook Frontend</description>
   <version>1.0</version>
 
-  <parent>
+  <!-- <parent>
     <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-parent</artifactId>
       <version>2.7.3</version>
     <relativePath/>
-  </parent>
+  </parent> -->
 
   <properties>
-    <java.version>11</java.version>
+    <maven.compiler.source>11</maven.compiler.source>
+    <maven.compiler.target>11</maven.compiler.target>
     <bootstrap.version>4.2.1</bootstrap.version>
   </properties>
+
+  <!-- Internal dependencies stored in Artifact Registry -->
+  <distributionManagement>
+    <snapshotRepository>
+      <id>artifact-registry</id>
+      <url>artifactregistry://us-central1-maven.pkg.dev/PROJECT_ID/guestbook-remote-repo</url>
+    </snapshotRepository>
+    <repository>
+      <id>artifact-registry</id>
+      <url>artifactregistry://us-central1-maven.pkg.dev/PROJECT_ID/guestbook-remote-repo</url>
+    </repository>
+  </distributionManagement>
+  
+  <repositories>
+    <repository>
+      <id>artifact-registry</id>
+      <url>artifactregistry://us-central1-maven.pkg.dev/PROJECT_ID/guestbook-remote-repo</url>
+      <layout>default</layout>
+      <releases>
+        <enabled>true</enabled>
+      </releases>
+      <snapshots>
+        <enabled>true</enabled>
+      </snapshots>
+    </repository>
+  </repositories>
+
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <!-- Import dependency management from Spring Boot -->
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-dependencies</artifactId>
+        <version>2.6.6</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
 
   <dependencies>
     <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-web</artifactId>
     </dependency>
-
     <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-thymeleaf</artifactId>
+    </dependency>
+    <!-- Example dependency -->
+    <dependency>
+      <groupId>com.example.guestbook</groupId>
+      <artifactId>java-guestbook-pojo</artifactId>
+      <version>1.0</version>
     </dependency>
   </dependencies>
 
@@ -70,5 +115,12 @@
         </configuration>
       </plugin>
     </plugins>
+    <extensions>
+      <extension>
+        <groupId>com.google.cloud.artifactregistry</groupId>
+        <artifactId>artifactregistry-maven-wagon</artifactId>
+        <version>2.1.5</version>
+      </extension>
+    </extensions>
   </build>
 </project>

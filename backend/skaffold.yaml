@@ -12,6 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+# This file is used in the full demo and quickstart for the deployment of the 
+# Backend to GKE via Cloud Deploy
+
 # To learn more about the skaffold.yaml schema visit
 # https://skaffold.dev/docs/references/yaml/
 apiVersion: skaffold/v2beta18

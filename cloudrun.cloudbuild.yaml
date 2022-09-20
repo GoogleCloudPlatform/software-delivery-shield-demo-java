@@ -12,8 +12,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+# This file is used in the full demo for the deployment of the Frontend and
+# Backend services to Cloud Run via Cloud Deploy
+
 steps:
-  - id: "Build and Push Container Frontend and Backend Images"
+  - id: "Build and Push Frontend and Backend Images via Skaffold"
     name: 'gcr.io/k8s-skaffold/skaffold'
     entrypoint: /bin/bash
     args:
@@ -25,7 +28,8 @@ steps:
         --tag=${SHORT_SHA} \
         --profile=dockerfile \
         --push=true
-  
+
+  ## Example of using Docker directly to build images
   # - id: "Build and Push Container Image: Frontend"
   #   name: "gcr.io/cloud-builders/docker"
   #   entrypoint: "/bin/bash"

@@ -3,10 +3,6 @@
 The Guestbook sample demonstrates how to deploy a 2 service application with a frontend service 
 and a backend service to GKE and Cloud Run using Cloud Deploy.  
 
-
-## Kubernetes architecture
-![Kubernetes Architecture Diagram](./img/diagram.png)
-
 ## Directory contents
 - `cloudbuild.yaml` - build images and deploy with Cloud Deploy
 - `clouddeploy.yaml` - Cloud Deploy pipeline definition

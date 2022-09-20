@@ -1,9 +1,7 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  
   <modelVersion>4.0.0</modelVersion>
-
   <groupId>com.example.guestbook</groupId>
   <artifactId>java-guestbook</artifactId>
   <version>1.0</version>
@@ -12,13 +10,14 @@
   <modules>
     <module>frontend</module>
     <module>backend</module>
+    <module>guestbook-pojo</module>
   </modules>
 
-  <!-- <repositories>
+  <repositories>
     <repository>
       <id>central</id>
       <name>Maven Central remote repository</name>
-      <url>artifactregistry://us-central1-maven.pkg.dev/PROJECT_ID/guestbook-remote-repo</url>
+      <url>artifactregistry://us-central1-maven.pkg.dev/PROJECT_ID/test-remote</url>
       <layout>default</layout>
       <releases>
         <enabled>true</enabled>
@@ -27,8 +26,8 @@
         <enabled>true</enabled>
       </snapshots>
     </repository>
-  </repositories> -->
-
+  </repositories>
+  
   <build>
     <pluginManagement>
       <plugins>
@@ -39,13 +38,5 @@
         </plugin>
       </plugins>
     </pluginManagement>
-    <!-- <extensions>
-      <extension>
-        <groupId>com.google.cloud.artifactregistry</groupId>
-        <artifactId>artifactregistry-maven-wagon</artifactId>
-        <version>2.1.5</version>
-      </extension>
-    </extensions> -->
   </build>
-
 </project>
