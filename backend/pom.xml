@@ -8,12 +8,12 @@
   <name>Guestbook Backend</name>
   <version>1.0</version>
 
-  <!-- <parent>
+  <parent>
     <groupId>org.springframework.boot</groupId>
     <artifactId>spring-boot-starter-parent</artifactId>
     <version>2.7.3</version>
     <relativePath />
-  </parent> -->
+  </parent>
 
   <properties>
     <maven.compiler.source>11</maven.compiler.source>
@@ -21,18 +21,18 @@
     <bootstrap.version>4.2.1</bootstrap.version>
   </properties>
 
-  <dependencyManagement>
+  <!-- <dependencyManagement>
     <dependencies>
-      <dependency>
+      <dependency> -->
         <!-- Import dependency management from Spring Boot -->
-        <groupId>org.springframework.boot</groupId>
+        <!-- <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-dependencies</artifactId>
         <version>2.6.6</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
     </dependencies>
-  </dependencyManagement>
+  </dependencyManagement> -->
 
   <dependencies>
     <dependency>
