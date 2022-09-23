@@ -24,3 +24,6 @@ spec:
         env:
         - name: GUESTBOOK_API_ADDR
           value: BACKEND_PROD
+  traffic:
+  - latestRevision: true
+    percent: 100

@@ -16,6 +16,15 @@
 # Backend services to GKE via Cloud Deploy
 
 steps:
+  - id: "Add Project ID to files"
+    name: "gcr.io/cloud-builders/gcloud:latest"
+    entrypoint: /bin/bash
+    args:
+    - "-xe"
+    - "-c"
+    - |
+      sed -i "s/PROJECT_ID/${PROJECT_ID}/g" **/pom.xml
+
   - id: "Cache Maven Dependencies in an Artifact Registry Remote Repo"
     name: gcr.io/cloud-builders/mvn
     args: ["compile"]
@@ -25,6 +34,7 @@ steps:
     dir: "guestbook-pojo"
     entrypoint: /bin/bash
     args:
+    - "-xe"
     - "-c"
     - |
       mvn deploy || echo "Artifact may already exist"
@@ -69,6 +79,14 @@ steps:
 images:
   - $_FRONTEND_IMAGE:$SHORT_SHA
   - $_BACKEND_IMAGE:$SHORT_SHA
+
+# artifacts:
+#   maven_artifacts:
+#   - repository: https://us-central1-maven.pkg.dev/${PROJECT_ID}/guestbook-remote-repo
+#     artifact_id: "java-guestbook-pojo"
+#     group_id: "com.example.guestbook"
+#     version: "1.0"
+#     path: "/workspace/guestbook-pojo/target/java-guestbook-pojo-1.0.jar"
 
 substitutions:
   _FRONTEND_IMAGE: 'us-central1-docker.pkg.dev/${PROJECT_ID}/containers/java-guestbook-frontend'

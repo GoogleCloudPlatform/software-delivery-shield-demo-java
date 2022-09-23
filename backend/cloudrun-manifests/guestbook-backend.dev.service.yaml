@@ -21,3 +21,6 @@ spec:
     spec:
       containers:
         - image: java-guestbook-backend
+  traffic:
+  - latestRevision: true
+    percent: 100

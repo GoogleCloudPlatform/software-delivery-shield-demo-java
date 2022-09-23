@@ -22,18 +22,18 @@
   <distributionManagement>
     <snapshotRepository>
       <id>artifact-registry</id>
-      <url>artifactregistry://us-central1-maven.pkg.dev/PROJECT_ID/guestbook-remote-repo</url>
+      <url>artifactregistry://us-central1-maven.pkg.dev/PROJECT_ID/guestbook-maven-repo</url>
     </snapshotRepository>
     <repository>
       <id>artifact-registry</id>
-      <url>artifactregistry://us-central1-maven.pkg.dev/PROJECT_ID/guestbook-remote-repo</url>
+      <url>artifactregistry://us-central1-maven.pkg.dev/PROJECT_ID/guestbook-maven-repo</url>
     </repository>
   </distributionManagement>
   
   <repositories>
     <repository>
       <id>artifact-registry</id>
-      <url>artifactregistry://us-central1-maven.pkg.dev/PROJECT_ID/guestbook-remote-repo</url>
+      <url>artifactregistry://us-central1-maven.pkg.dev/PROJECT_ID/guestbook-maven-repo</url>
       <layout>default</layout>
       <releases>
         <enabled>true</enabled>

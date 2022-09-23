@@ -14,7 +14,7 @@
 
 package example.guestbook.frontend;
 
-import example.guestbook.GuestBookEntry;
+import com.example.guestbook.GuestBookEntry;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;

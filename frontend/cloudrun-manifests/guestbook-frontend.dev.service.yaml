@@ -19,8 +19,12 @@ metadata:
 spec:
   template:
     spec:
+      serviceAccountName: frontend-dev-identity
       containers:
       - image: java-guestbook-frontend
         env:
         - name: GUESTBOOK_API_ADDR
           value: BACKEND_DEV
+  traffic:
+  - latestRevision: true
+    percent: 100

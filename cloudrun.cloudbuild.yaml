@@ -16,49 +16,56 @@
 # Backend services to Cloud Run via Cloud Deploy
 
 steps:
-  - id: "Build and Push Frontend and Backend Images via Skaffold"
-    name: 'gcr.io/k8s-skaffold/skaffold'
+  - id: "Add Project ID to files"
+    name: "gcr.io/cloud-builders/gcloud:latest"
     entrypoint: /bin/bash
     args:
     - "-xe"
     - "-c"
     - |
-      skaffold build --file-output=./artifacts.json \
-        --default-repo=$_IMAGE_REPO \
-        --tag=${SHORT_SHA} \
-        --profile=dockerfile \
-        --push=true
+      sed -i "s/PROJECT_ID/${PROJECT_ID}/g" **/pom.xml
 
-  ## Example of using Docker directly to build images
-  # - id: "Build and Push Container Image: Frontend"
-  #   name: "gcr.io/cloud-builders/docker"
-  #   entrypoint: "/bin/bash"
-  #   dir: "frontend"
-  #   args:
-  #     - "-c"
-  #     - |
-  #       docker build -t $_FRONTEND_IMAGE .
-  #       docker push $_FRONTEND_IMAGE
+  - id: "Cache Maven Dependencies in an Artifact Registry Remote Repo"
+    name: gcr.io/cloud-builders/mvn
+    args: ["compile"]
 
-  # - id: "Build and Push Container Image: Backend"
-  #   name: "gcr.io/cloud-builders/docker"
-  #   entrypoint: "/bin/bash"
-  #   dir: "backend"
-  #   args:
-  #     - "-c"
-  #     - |
-  #       docker build -t $_BACKEND_IMAGE .
-  #       docker push $_BACKEND_IMAGE
+  - id: "Build Maven Artifact with Provenance"
+    name: "gcr.io/cloud-builders/mvn"
+    dir: "guestbook-pojo"
+    entrypoint: /bin/bash
+    args:
+    - "-xe"
+    - "-c"
+    - |
+      mvn deploy || echo "Artifact may already exist"
 
-  - id: "Deploy to Cloud Run"
+  - id: "Build and Push Container Image: Frontend"
+    name: "gcr.io/cloud-builders/docker"
+    entrypoint: "/bin/bash"
+    dir: "frontend"
+    args:
+      - "-c"
+      - |
+        docker build --network=cloudbuild -t $_FRONTEND_IMAGE:$SHORT_SHA . 
+        docker push $_FRONTEND_IMAGE:$SHORT_SHA
+
+  - id: "Build and Push Container Image: Backend"
+    name: "gcr.io/cloud-builders/docker"
+    entrypoint: "/bin/bash"
+    dir: "backend"
+    args:
+      - "-c"
+      - |
+        docker build --network=cloudbuild -t $_BACKEND_IMAGE:$SHORT_SHA .
+        docker push $_BACKEND_IMAGE:$SHORT_SHA
+
+  - id: "Create Cloud Deploy Release"
     name: "gcr.io/cloud-builders/gcloud:latest"
     entrypoint: /bin/bash
     args:
+      - "-xe"
       - "-c"
-      - "-x"
       - |
-        gcloud run deploy guestbook-backend-dev --image gcr.io/cloudrun/hello --region us-central1
-        gcloud run deploy guestbook-backend-prod --image gcr.io/cloudrun/hello --region us-central1
         dev_url=$(gcloud run services describe guestbook-backend-dev --region us-central1 --format='value(status.url)')
         prod_url=$(gcloud run services describe guestbook-backend-prod --region us-central1 --format='value(status.url)')
 
@@ -69,44 +76,30 @@ steps:
           --region $_REGION \
           --delivery-pipeline=cloudrun-guestbook-backend-delivery \
           --skaffold-file=./backend/cloudrun.skaffold.yaml \
-          --images=java-guestbook-backend=$_BACKEND_IMAGE
+          --images=java-guestbook-backend=$_BACKEND_IMAGE:${SHORT_SHA}
 
         gcloud deploy releases create frontend-release-${SHORT_SHA} \
           --region $_REGION \
           --delivery-pipeline=cloudrun-guestbook-frontend-delivery \
           --skaffold-file=./frontend/cloudrun.skaffold.yaml \
-          --images=java-guestbook-frontend=$_FRONTEND_IMAGE
-
-
-  # - id: "Deploy to Cloud Run"
-  #   name: "gcr.io/cloud-builders/gcloud:latest"
-  #   entrypoint: /bin/bash
-  #   args:
-  #     - "-c"
-  #     - |
-  #       gcloud run deploy backend \
-  #         --image us-central1-docker.pkg.dev/${PROJECT_ID}/containers/backend:${SHORT_SHA} \
-  #         --allow-unauthenticated \
-  #         --region ${_REGION} 
-
-  #       echo $(gcloud run services describe backend \
-  #         --region ${_REGION} \
-  #         --format='value(status.url)') > _service_url
-
-  #       gcloud run deploy frontend \
-  #         --image us-central1-docker.pkg.dev/${PROJECT_ID}/containers/frontend:${SHORT_SHA} \
-  #         --allow-unauthenticated \
-  #         --region ${_REGION} \
-  #         --set-env-vars GUESTBOOK_API_ADDR=$(cat _service_url)
+          --images=java-guestbook-frontend=$_FRONTEND_IMAGE:${SHORT_SHA}
 
 images:
-  - $_FRONTEND_IMAGE
-  - $_BACKEND_IMAGE
+  - $_FRONTEND_IMAGE:$SHORT_SHA
+  - $_BACKEND_IMAGE:$SHORT_SHA
+
+# artifacts:
+#   maven_artifacts:
+#   - repository: https://us-central1-maven.pkg.dev/${PROJECT_ID}/guestbook-remote-repo
+#     artifact_id: "java-guestbook-pojo"
+#     group_id: "com.example.guestbook"
+#     version: "1.0"
+#     path: "/workspace/guestbook-pojo/target/java-guestbook-pojo-1.0.jar"
 
 substitutions:
-  _IMAGE_REPO: 'us-central1-docker.pkg.dev/${PROJECT_ID}/containers'
-  _FRONTEND_IMAGE: 'us-central1-docker.pkg.dev/${PROJECT_ID}/containers/java-guestbook-frontend:${SHORT_SHA}'
-  _BACKEND_IMAGE: 'us-central1-docker.pkg.dev/${PROJECT_ID}/containers/java-guestbook-backend:${SHORT_SHA}'
+  _FRONTEND_IMAGE: 'us-central1-docker.pkg.dev/${PROJECT_ID}/containers/java-guestbook-frontend'
+  _BACKEND_IMAGE: 'us-central1-docker.pkg.dev/${PROJECT_ID}/containers/java-guestbook-backend'
   _REGION: us-central1
+
 options:
     dynamic_substitutions: true
