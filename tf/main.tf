@@ -69,55 +69,53 @@ resource "google_artifact_registry_repository" "guestbook_remote_repo" {
 resource "google_project_iam_member" "cb_deploy_operator" {
   project = "your-project-id"
   role    = "roles/clouddeploy.operator"
-  member  = "serviceAccount:PROJET_NUM@cloudbuild.gserviceaccount.com"
+  member  = "serviceAccount:PROJECT_NUM@cloudbuild.gserviceaccount.com"
 }
 
 resource "google_project_iam_member" "cb_sa_user" {
   project = "your-project-id"
   role    = "roles/iam.serviceAccountUser"
-  member  = "serviceAccount:PROJET_NUM@cloudbuild.gserviceaccount.com"
+  member  = "serviceAccount:PROJECT_NUM@cloudbuild.gserviceaccount.com"
 }
 
 resource "google_project_iam_member" "cb_container_admin" {
   project = "your-project-id"
   role    = "roles/container.admin"
-  member  = "serviceAccount:PROJET_NUM@cloudbuild.gserviceaccount.com"
+  member  = "serviceAccount:PROJECT_NUM@cloudbuild.gserviceaccount.com"
 }
 
 resource "google_project_iam_member" "default_container_dev" {
   project = "your-project-id"
   role    = "roles/container.developer"
-  member  = "serviceAccount:PROJET_NUM-compute@developer.gserviceaccount.com"
+  member  = "serviceAccount:PROJECT_NUM-compute@developer.gserviceaccount.com"
 }
 
 resource "google_project_iam_member" "default_deploy_runner" {
   project = "your-project-id"
   role    = "roles/clouddeploy.jobRunner"
-  member  = "serviceAccount:PROJET_NUM-compute@developer.gserviceaccount.com"
+  member  = "serviceAccount:PROJECT_NUM-compute@developer.gserviceaccount.com"
 }
 
 resource "google_project_iam_member" "default_ar_reader" {
   project = "your-project-id"
   role    = "roles/artifactregistry.reader"
-  member  = "serviceAccount:PROJET_NUM-compute@developer.gserviceaccount.com"
+  member  = "serviceAccount:PROJECT_NUM-compute@developer.gserviceaccount.com"
 }
 
-# Set bin auth policy
-# resource "google_binary_authorization_policy" "policy" {
-#   default_admission_rule {
-#     evaluation_mode         = "REQUIRE_ATTESTATION"
-#     enforcement_mode        = "ENFORCED_BLOCK_AND_AUDIT_LOG"
-#     require_attestations_by = ["projects/PROJECT_ID/attestors/built-by-cloud-build"] # google_binary_authorization_attestor.attestor.name
-#   }
+# Set Binary Authorization policy
+resource "google_binary_authorization_policy" "policy" {
+  default_admission_rule {
+    evaluation_mode         = "REQUIRE_ATTESTATION"
+    enforcement_mode        = "ENFORCED_BLOCK_AND_AUDIT_LOG"
+    require_attestations_by = ["projects/PROJECT_ID/attestors/built-by-cloud-build"]
+  }
 
-#   global_policy_evaluation_mode = "ENABLE"
-# }
+  global_policy_evaluation_mode = "ENABLE"
+}
 
 # GKE Clusters
 resource "google_container_cluster" "dev_cluster" {
-  name                     = "dev-cluster2"
-#   remove_default_node_pool = true
-#   initial_node_count       = 1
+  name                     = "dev-cluster"
   location                 = "us-central1"
   binary_authorization {
     evaluation_mode = "PROJECT_SINGLETON_POLICY_ENFORCE"
@@ -129,9 +127,7 @@ resource "google_container_cluster" "dev_cluster" {
 }
 
 resource "google_container_cluster" "prod_cluster" {
-  name                     = "prod-cluster2"
-#   remove_default_node_pool = true
-#   initial_node_count       = 1
+  name                     = "prod-cluster"
   location                 = "us-central1"
   binary_authorization {
     evaluation_mode = "PROJECT_SINGLETON_POLICY_ENFORCE"
@@ -142,7 +138,6 @@ resource "google_container_cluster" "prod_cluster" {
 }
 
 # Cloud Deploy
-
 resource "google_clouddeploy_target" "dev" {
   location = "us-central1"
   name     = "dev-cluster"

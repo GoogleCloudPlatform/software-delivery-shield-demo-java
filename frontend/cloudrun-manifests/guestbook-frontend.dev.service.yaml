@@ -19,7 +19,7 @@ metadata:
 spec:
   template:
     spec:
-      serviceAccountName: frontend-dev-identity
+      serviceAccountName: frontend-dev-identity@PROJECT_ID.iam.gserviceaccount.com
       containers:
       - image: java-guestbook-frontend
         env:
