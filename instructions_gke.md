@@ -143,7 +143,7 @@
 1. Submit the Cloud Build:
 
     ```sh
-    gcloud builds submit --config cloudbuild.yaml --substitutions SHORT_SHA=1234
+    gcloud builds submit --config cloudbuild.yaml --substitutions SHORT_SHA=1234 --region us-central1
     ```
     The build does the following:
     * Caches dependency artifacts into an Artifact Registry Maven Packages remote repo. The first time that you request a version of a package, Artifact Registry downloads and caches the package in the remote repository. The next time you request the same package version, Artifact Registry serves the cached copy.
