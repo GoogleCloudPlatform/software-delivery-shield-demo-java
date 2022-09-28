@@ -19,23 +19,23 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.TimeZone;
 
-/**
- * Controls printing the time that has passed between a given timestamp and now
- */
+/** Controls printing the time that has passed between a given timestamp and now */
 public interface PrintDuration {
 
   int DAYS_IN_YEAR = 365;
 
   /**
    * print the duration since a timestamp in a human-readable way
-   * @param prevTimestamp a timestamp representing when a post was made
-   *                      represented as ms since epoch
+   *
+   * @param prevTimestamp a timestamp representing when a post was made represented as ms since
+   *     epoch
    * @return a short string representing the time since prevTimestamp
    */
   static String print(long prevTimestamp) {
     LocalDateTime now = LocalDateTime.now();
-    LocalDateTime prev = LocalDateTime.ofInstant(
-      Instant.ofEpochMilli(prevTimestamp), TimeZone.getDefault().toZoneId());
+    LocalDateTime prev =
+        LocalDateTime.ofInstant(
+            Instant.ofEpochMilli(prevTimestamp), TimeZone.getDefault().toZoneId());
     Duration duration = Duration.between(now, prev);
 
     long num;

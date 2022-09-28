@@ -17,10 +17,10 @@ a backend service to Google Kubernetes Engine and Cloud Run using Cloud Deploy.
   - `guestbook-backend.service.yaml` - exposes the backend service on an internal IP in the cluster
 
 - `cloudrun-manifests/` - Cloud Run Service YAML files
-  - `guesbook-backend.dev.service.yaml`
-  - `guesbook-backend.prod.service.yaml`
-  - `guesbook-frontend.dev.service.yaml`
-  - `guesbook-frontend.prod.service.yaml`
+  - `guestbook-backend.dev.service.yaml`
+  - `guestbook-backend.prod.service.yaml`
+  - `guestbook-frontend.dev.service.yaml`
+  - `guestbook-frontend.prod.service.yaml`
 
 ## Demo Instructions
 

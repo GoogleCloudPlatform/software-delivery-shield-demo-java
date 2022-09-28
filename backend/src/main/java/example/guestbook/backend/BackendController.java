@@ -46,7 +46,6 @@ public class BackendController {
    */
   @PostMapping("/messages")
   public final GuestBookEntry addMessage(@RequestBody GuestBookEntry message) {
-    System.out.println(message.toString());
     message.setDate(System.currentTimeMillis());
     return this.repository.save(message);
   }
