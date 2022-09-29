@@ -22,14 +22,14 @@ steps:
     args:
       - "-c"
       - |
-        docker build -t $_BACKEND_IMAGE:$SHORT_SHA .
-        docker push $_BACKEND_IMAGE:$SHORT_SHA
+        docker build -t $_BACKEND_IMAGE .
+        docker push $_BACKEND_IMAGE
 
 images:
-  - $_BACKEND_IMAGE:$SHORT_SHA
+  - $_BACKEND_IMAGE
 
 substitutions:
-  _BACKEND_IMAGE: 'us-central1-docker.pkg.dev/${PROJECT_ID}/containers/java-guestbook-backend'
+  _BACKEND_IMAGE: 'us-central1-docker.pkg.dev/${PROJECT_ID}/containers/java-guestbook-backend:quickstart'
 
 options:
   dynamic_substitutions: true
