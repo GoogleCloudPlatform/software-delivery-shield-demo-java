@@ -1,4 +1,4 @@
-# Software Delivery Shield Java Demo
+# Software Delivery Shield Demo for Java
 
 This sample demonstrates security features for an end to end Java workflow. 
 This samples deploys a multi-tiered application with a frontend service and 
@@ -24,5 +24,16 @@ a backend service to Google Kubernetes Engine and Cloud Run using Cloud Deploy.
 
 ## Demo Instructions
 
-* [Deploy to GKE](./instructions_gke.md)
-* [Deploy to Cloud Run](./instructions_cloudrun.md)
+[Deploy to GKE](./instructions_gke.md)  
+[Deploy to Cloud Run](./instructions_cloudrun.md)
+
+### Pre-reqs
+The permissions needed for these tutorials can be fulfilled by the [Owner or Editor roles](https://cloud.google.com/iam/docs/understanding-roles#basic-definitions).
+
+Note: [Organization](https://cloud.google.com/resource-manager/docs/organization-policy/overview) or [Binary Authorization](https://cloud.google.com/binary-authorization/docs/key-concepts#policies) policies may already be set for your organization and may cause deployment errors.
+
+You will need:
+* To create or select a [Google Cloud project](https://cloud.google.com/resource-manager/docs/creating-managing-projects)
+* To make sure that billing is enabled for your Cloud project. Learn how to [check if billing is enabled on a project](https://cloud.google.com/billing/docs/how-to/verify-billing-enabled)
+* To [Install and initialize the gcloud CLI](https://cloud.google.com/sdk/docs/install) and authenticate via: `gcloud auth login`
+

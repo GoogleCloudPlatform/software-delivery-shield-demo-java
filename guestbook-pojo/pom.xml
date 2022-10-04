@@ -24,7 +24,7 @@
       <url>artifactregistry://us-central1-maven.pkg.dev/PROJECT_ID/guestbook-maven-repo</url>
     </repository>
   </distributionManagement>
-  
+
   <repositories>
     <repository>
       <id>artifact-registry</id>
@@ -57,7 +57,16 @@
           <skip>true</skip>
         </configuration>
       </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-checkstyle-plugin</artifactId>
+        <version>3.2.0</version>
+        <configuration>
+          <configLocation>google_checks.xml</configLocation>
+        </configuration>
+      </plugin>
     </plugins>
+    
     <extensions>
       <extension>
         <groupId>com.google.cloud.artifactregistry</groupId>
