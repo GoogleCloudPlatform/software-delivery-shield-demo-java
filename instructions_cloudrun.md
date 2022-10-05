@@ -27,7 +27,11 @@
         containersecurity.googleapis.com
     ```
 
-1. Download the [Cloud Code Source Protect Plugin]()
+1. Download **Cloud Code source protect (Preview)**
+
+   [Cloud Code](https://cloud.google.com/code/docs) source protect is not available
+   for public access. To get access to this feature, see the
+   [access request page][access].
 
 1. Make sure the default Compute Engine service account and Cloud Build service account have sufficient permissions.
 
@@ -124,8 +128,9 @@
 
         **⚠️ Note:** If your organization doesn’t allow public services, the frontend services may error during deployment. Change flag `--allow-unauthenticated` to `--no-allow-unauthenticated`. However, this means your frontend service will need an authentication header to access.
 
+### Setup
 
-1. Set a Binary Authorization Policy:
+1. Set a **[Binary Authorization](https://cloud.google.com/binary-authorization/docs/deploy-cloud-build)** policy:
 
     ```sh
     gcloud container binauthz policy import policy.yaml
@@ -133,7 +138,7 @@
 
     **⚠️ Note:** For your project to have the built by Cloud Build attestor, you need to run a build first (see above).
 
-1. Enable Binary Authorization:
+1. Enable **Binary Authorization** on the Cloud Run services:
 
     ```sh
     gcloud run services update guestbook-backend-dev --binary-authorization=default
@@ -142,7 +147,7 @@
     gcloud run services update guestbook-frontend-prod --binary-authorization=default
     ```
 
-1. Create an Artifact Registry Docker repository:
+1. Create an **Artifact Registry [Docker repository](https://cloud.google.com/artifact-registry/docs/docker)**:
 
     ```sh
     gcloud artifacts repositories create containers \
@@ -150,7 +155,7 @@
         --description="Docker repository"
     ```
 
-1. Create an Artifact Registry Maven repository:
+1. Create an **Artifact Registry [Maven repository](https://cloud.google.com/artifact-registry/docs/java)**:
 
     ```sh
     gcloud artifacts repositories create guestbook-maven-repo \
@@ -159,7 +164,11 @@
         --description="My Maven repo" 
     ```
 
-1. Create an Artifact Registry remote repository ([learn more about remote repos](https://cloud.google.com/artifact-registry/docs/repositories/remote-repo)):
+1. Create an **Artifact Registry [remote repository](https://cloud.google.com/artifact-registry/docs/repositories/remote-repo) (Preview)**: 
+    This feature is not available for public access. To get access to this feature, 
+    see the [access request page][access].
+
+    With access uncomment `<repositories>...</repositories>` in [`pom.xml`](./pom.xml).
 
     ```sh
     gcloud artifacts repositories create guestbook-remote-repo \
@@ -171,7 +180,7 @@
         --remote-mvn-repo=MAVEN-CENTRAL
     ```
 
-1. Create your Cloud Deploy delivery pipeline and targets:
+1. Create your **Cloud Deploy** delivery pipeline and targets:
 
     ```sh
     gcloud deploy apply --file ./frontend/cloudrun.clouddeploy.yaml
@@ -182,48 +191,53 @@
 
 ### Demo
 
-1. Use the Cloud Code Source Protect Plugin to view dependencies vulnerabilities:
+1. Use the **Cloud Code source protect** ([request access][access]) plugin to view dependencies vulnerabilities:
 
     In [`backend/pom.xml`](./backend/pom.xml) locate the `com.google.code.gson:gson` dependency. The plugin should advise to update the dependency to v2.8.9+.
 
-1. Submit the Cloud Build:
+1. Submit the Cloud Build config:
 
     ```sh
     gcloud builds submit --config cloudrun.cloudbuild.yaml --substitutions SHORT_SHA=1234 --region us-central1
     ```
+
     The build does the following:
-    * Caches dependency artifacts into an Artifact Registry Maven Packages remote repo. The first time that you request a version of a package, Artifact Registry downloads and caches the package in the remote repository. The next time you request the same package version, Artifact Registry serves the cached copy.
-    * Builds and stores a Java dependency artifacts to Artifact Registry with provenance
-    * Builds and push containers to Artifact Registry
-    * Automatically signs the artifacts with the attestor: “built-with-cloud-build”
+
+    * Caches dependency artifacts into an **Artifact Registry remote repo** ([request access][access]). The first time that you request a version of a package, Artifact Registry downloads and caches the package in the remote repository. The next time you request the same package version, Artifact Registry serves the cached copy.
+    * Builds and stores a Java dependency artifacts to Artifact Registry 
+    * Builds and push containers to Artifact Registry, where **[Container Analysis](https://cloud.google.com/container-analysis/docs/container-analysis)** provides integrated on-demand or automated scanning for base container images, Maven & Go packages in containers, and for non-containerized Maven packages.
+    * Automatically signs the artifacts with the attestor: [“built-with-cloud-build”](https://cloud.google.com/binary-authorization/docs/deploy-cloud-build)
     * Creates a release via Cloud Deploy
 
 1. View the container vulnerabilities, dependencies, and provenance via Cloud Build:
     * Open the [Cloud Build console](https://console.cloud.google.com/cloud-build/builds)
     * Click on the build ID to view the build
     * Click the "Build Artifacts" tab
-    * Click "View" under "Security Insights"
+    * Click "View" under ["Security Insights"](https://cloud.google.com/software-supply-chain-security/docs/sds/build-view-security-insights)
+        * Cloud Build supports [SLSA Level 3 builds for container images](https://cloud.google.com/build/docs/securing-builds/view-build-provenance) and generates authenticated and non-falsifiable [build provenance](https://cloud.google.com/build/docs/securing-builds/view-build-provenance) for containerized applications.
+        * Container Analysis provides standalone scanning (Preview) that identifies existing vulnerabilities and new vulnerabilities within the open source dependencies used by your Maven artifacts. This feature is not available for public access. To get access to this feature, see the [access request page][access].
     * Click on "Artifacts scanned" to view vulnerabilities in Artifact Registry
 
-1. View the Maven artifact provenance via Cloud Build:
-    * TODO
-
-1. View artifacts cached in the Artifact Registry remote repository:
+1. View artifacts cached in the **Artifact Registry remote repository** ([request access][access]):
 
     ```sh
     gcloud artifacts files list --repository=guestbook-remote-repo
     ```
 
-1. View **Cloud Run Security** insights:
+1. View **[Cloud Run Security](https://cloud.devsite.corp.google.com/software-supply-chain-security/docs/sds/deploy-run-view-security-insights)** insights:
     * [Navigate to a Cloud Run service](https://console.cloud.google.com/run/detail/us-central1/guestbook-backend-dev)
     * Click the "Revisions" tab
     * Click the right-hand "Security" tab to iew the container vulnerabilities, dependencies, and provenance
 
-1. Deploy the release to production via Cloud Deploy:
+1. Deploy the release to production via **Cloud Deploy**:
     * [Navigate to the Cloud Deploy pipeline](https://console.cloud.google.com/deploy/delivery-pipelines/us-central1/cloudrun-guestbook-backend-delivery)
     * Click "Promote"
 
 ### Test the Binary Authorization policy
+
+The Binary Authorization policy should prevent deployment of containers that
+were not built by Cloud Build. This example shows a failed deployment when deploying
+a locally built container.
 
 1. Build the container locally via Jib (Cloud Build signs builds with built-by-cloudbuild attestor, so this will not be signed):
 
@@ -241,3 +255,5 @@
     --skaffold-file=./cloudrun.skaffold.yaml \
     --images=java-guestbook-backend=us-central1-docker.pkg.dev/$PROJECT_ID/containers/java-guestbook-backend:blocked
     ```
+
+[access]: https://docs.google.com/forms/d/e/1FAIpQLSeBUSpLmXsvGhnKfYx7g-Cmd-oth9yXbUTZNFIL87cdGIu2RQ/viewform?resourcekey=0-tR1FN8wQtdR43sJixQL3jw
