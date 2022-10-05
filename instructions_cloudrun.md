@@ -87,6 +87,18 @@
 
 1. Deploy placeholder services
 
+    1. Deploy placeholder services for the private backend:
+
+        ```sh
+        gcloud run deploy guestbook-backend-dev \
+            --image gcr.io/cloudrun/hello \
+            --no-allow-unauthenticated
+
+        gcloud run deploy guestbook-backend-prod \
+            --image gcr.io/cloudrun/hello \
+            --no-allow-unauthenticated
+        ```
+
     1. Create a service account for the frontend service to invoke the private backend service:
 
         ```sh
@@ -102,19 +114,9 @@
             --role roles/run.invoker
         ```
 
-    1. Deploy placeholder service with a private backend and a public frontend:
-
+    1. Deploy placeholder services for the public frontend:
+    
         ```sh
-        # Backend services
-        gcloud run deploy guestbook-backend-dev \
-            --image gcr.io/cloudrun/hello \
-            --no-allow-unauthenticated
-
-        gcloud run deploy guestbook-backend-prod \
-            --image gcr.io/cloudrun/hello \
-            --no-allow-unauthenticated
-
-        # Frontend services
         gcloud run deploy guestbook-frontend-dev \
             --image gcr.io/cloudrun/hello \
             --allow-unauthenticated \
