@@ -71,32 +71,39 @@
             --member=serviceAccount:$(gcloud projects describe $PROJECT_ID \
             --format="value(projectNumber)")-compute@developer.gserviceaccount.com \
             --role="roles/clouddeploy.jobRunner"
+
+        gcloud projects add-iam-policy-binding $PROJECT_ID \
+            --member=serviceAccount:$(gcloud projects describe $PROJECT_ID \
+            --format="value(projectNumber)")-compute@developer.gserviceaccount.com \
+            --role="roles/iam.serviceAccountUser"
         ```
 
 1. Replace PROJECT_ID placeholder with your Project Id
     * MacOS
         ```sh
-        sed -i '.bak' 's/PROJECT_ID/$PROJECT_ID/g' **/*clouddeploy.yaml policy.yaml pom.xml
+        sed -i '.bak' "s/PROJECT_ID/$PROJECT_ID/g" **/*clouddeploy.yaml policy.yaml pom.xml
         ```
     * Linux
         ```sh
-        sed -i 's/PROJECT_ID/$PROJECT_ID/g' **/*clouddeploy.yaml policy.yaml pom.xml
+        sed -i "s/PROJECT_ID/$PROJECT_ID/g" **/*clouddeploy.yaml policy.yaml pom.xml
         ```
 
 ### Setup
 
-1. Deploy placeholder services
+1. Deploy placeholder services:
 
     1. Deploy placeholder services for the private backend:
 
         ```sh
+        cd backend
         gcloud run deploy guestbook-backend-dev \
-            --image gcr.io/cloudrun/hello \
+            --source . \
             --no-allow-unauthenticated
 
         gcloud run deploy guestbook-backend-prod \
-            --image gcr.io/cloudrun/hello \
+            --source . \
             --no-allow-unauthenticated
+        cd ..
         ```
 
     1. Create a service account for the frontend service to invoke the private backend service:
@@ -115,7 +122,7 @@
         ```
 
     1. Deploy placeholder services for the public frontend:
-    
+
         ```sh
         gcloud run deploy guestbook-frontend-dev \
             --image gcr.io/cloudrun/hello \
