@@ -21,12 +21,12 @@ see the [access request page](https://docs.google.com/forms/d/e/1FAIpQLSeBUSpLmX
 ### Pre-Reqs
 The permissions needed for these tutorials can be fulfilled by the [Owner or Editor roles](https://cloud.google.com/iam/docs/understanding-roles#basic-definitions).
 
-Note: [Organization](https://cloud.google.com/resource-manager/docs/organization-policy/overview) or [Binary Authorization](https://cloud.google.com/binary-authorization/docs/key-concepts#policies) policies may already be set for your organization and may cause deployment errors.
+> **Note:** [Organization](https://cloud.google.com/resource-manager/docs/organization-policy/overview) or [Binary Authorization](https://cloud.google.com/binary-authorization/docs/key-concepts#policies) policies may already be set for your organization and may cause deployment errors.
 
 You will need:
 * To create or select a [Google Cloud project](https://cloud.google.com/resource-manager/docs/creating-managing-projects). 
 
-  **Note:** If you don't plan to keep the resources that you create in this procedure, create a project instead of selecting an existing project. After you finish these steps, you can delete the project, removing all resources associated with the project.
+  > **Note:** If you don't plan to keep the resources that you create in this procedure, create a project instead of selecting an existing project. After you finish these steps, you can delete the project, removing all resources associated with the project.
 
 * To make sure that billing is enabled for your Cloud project. Learn how to [check if billing is enabled on a project](https://cloud.google.com/billing/docs/how-to/verify-billing-enabled).
 

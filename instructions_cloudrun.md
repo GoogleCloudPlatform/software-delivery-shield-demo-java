@@ -20,7 +20,7 @@
         artifactregistry.googleapis.com \
         cloudbuild.googleapis.com \
         clouddeploy.googleapis.com \
-        cloudrun.googleapis.com \
+        run.googleapis.com \
         binaryauthorization.googleapis.com \
         containeranalysis.googleapis.com \
         containerscanning.googleapis.com \
@@ -35,7 +35,7 @@
 
 1. Make sure the default Compute Engine service account and Cloud Build service account have sufficient permissions.
 
-    Note: The service account might already have the necessary permissions. These steps are included for projects that disable automatic role grants for default service accounts.
+    > **Note:** The service account might already have the necessary permissions. These steps are included for projects that disable automatic role grants for default service accounts.
 
     * Grant the Cloud Build service account privilege:
         * to invoke deployments with Google Cloud Deploy and to update the delivery pipeline and the target definitions
