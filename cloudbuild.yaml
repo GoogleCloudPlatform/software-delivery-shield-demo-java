@@ -29,7 +29,7 @@ steps:
     name: gcr.io/cloud-builders/mvn
     args: ["compile"]
 
-  - id: "Build Maven Artifact with Provenance"
+  - id: "Build Maven Artifact"
     name: "gcr.io/cloud-builders/mvn"
     dir: "guestbook-pojo"
     entrypoint: /bin/bash
@@ -79,14 +79,6 @@ steps:
 images:
   - $_FRONTEND_IMAGE:$SHORT_SHA
   - $_BACKEND_IMAGE:$SHORT_SHA
-
-# artifacts:
-#   maven_artifacts:
-#   - repository: https://us-central1-maven.pkg.dev/${PROJECT_ID}/guestbook-remote-repo
-#     artifact_id: "java-guestbook-pojo"
-#     group_id: "com.example.guestbook"
-#     version: "1.0"
-#     path: "/workspace/guestbook-pojo/target/java-guestbook-pojo-1.0.jar"
 
 substitutions:
   _FRONTEND_IMAGE: 'us-central1-docker.pkg.dev/${PROJECT_ID}/containers/java-guestbook-frontend'

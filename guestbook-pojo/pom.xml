@@ -13,7 +13,7 @@
     <maven.compiler.target>11</maven.compiler.target>
   </properties>
 
-
+  <!-- Store Maven artifact in Artifact Registry -->
   <distributionManagement>
     <snapshotRepository>
       <id>artifact-registry</id>
