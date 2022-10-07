@@ -124,20 +124,20 @@
     1. Deploy placeholder services for the public frontend:
 
         ```sh
+        cd frontend
         gcloud run deploy guestbook-frontend-dev \
-            --image gcr.io/cloudrun/hello \
+            --source . \
             --allow-unauthenticated \
             --service-account frontend-dev-identity@$PROJECT_ID.iam.gserviceaccount.com
 
         gcloud run deploy guestbook-frontend-prod \
-            --image gcr.io/cloudrun/hello \
+            --source . \
             --allow-unauthenticated \
             --service-account frontend-prod-identity@$PROJECT_ID.iam.gserviceaccount.com
+        cd ..
         ```
 
         **⚠️ Note:** If your organization doesn’t allow public services, the frontend services may error during deployment. Change flag `--allow-unauthenticated` to `--no-allow-unauthenticated`. However, this means your frontend service will need an authentication header to access.
-
-### Setup
 
 1. Set a **[Binary Authorization](https://cloud.google.com/binary-authorization/docs/deploy-cloud-build)** policy:
 
@@ -218,6 +218,18 @@
     * Automatically signs the artifacts with the attestor: [“built-with-cloud-build”](https://cloud.google.com/binary-authorization/docs/deploy-cloud-build)
     * Creates a release via Cloud Deploy
 
+1. View artifacts cached in the **Artifact Registry remote repository** ([request access][access]):
+
+    ```sh
+    gcloud artifacts files list --repository=guestbook-remote-repo
+    ```
+
+1. View artifact deployed to the **Artifact Registry Maven repository**:
+
+    ```sh
+    gcloud artifacts packages list --repository=guestbook-maven-repo --location=us-central1
+    ```
+
 1. View the container vulnerabilities, dependencies, and provenance via Cloud Build:
     * Open the [Cloud Build console](https://console.cloud.google.com/cloud-build/builds)
     * Click on the build ID to view the build
@@ -226,12 +238,6 @@
         * Cloud Build supports [SLSA Level 3 builds for container images](https://cloud.google.com/build/docs/securing-builds/view-build-provenance) and generates authenticated and non-falsifiable [build provenance](https://cloud.google.com/build/docs/securing-builds/view-build-provenance) for containerized applications.
         * Container Analysis provides standalone scanning (Preview) that identifies existing vulnerabilities and new vulnerabilities within the open source dependencies used by your Maven artifacts. This feature is not available for public access. To get access to this feature, see the [access request page][access].
     * Click on "Artifacts scanned" to view vulnerabilities in Artifact Registry
-
-1. View artifacts cached in the **Artifact Registry remote repository** ([request access][access]):
-
-    ```sh
-    gcloud artifacts files list --repository=guestbook-remote-repo
-    ```
 
 1. View **[Cloud Run Security](https://cloud.devsite.corp.google.com/software-supply-chain-security/docs/sds/deploy-run-view-security-insights)** insights:
     * [Navigate to a Cloud Run service](https://console.cloud.google.com/run/detail/us-central1/guestbook-backend-dev)
@@ -260,9 +266,9 @@ a locally built container.
 
     ```sh
     gcloud deploy releases create backend-release-blocked \
-    --delivery-pipeline=cloudrun-guestbook-backend-delivery \
-    --skaffold-file=./cloudrun.skaffold.yaml \
-    --images=java-guestbook-backend=us-central1-docker.pkg.dev/$PROJECT_ID/containers/java-guestbook-backend:blocked
+        --delivery-pipeline=cloudrun-guestbook-backend-delivery \
+        --skaffold-file=./cloudrun.skaffold.yaml \
+        --images=java-guestbook-backend=us-central1-docker.pkg.dev/$PROJECT_ID/containers/java-guestbook-backend:blocked
     ```
 
 [access]: https://docs.google.com/forms/d/e/1FAIpQLSeBUSpLmXsvGhnKfYx7g-Cmd-oth9yXbUTZNFIL87cdGIu2RQ/viewform?resourcekey=0-tR1FN8wQtdR43sJixQL3jw
