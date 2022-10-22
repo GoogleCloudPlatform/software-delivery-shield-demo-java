@@ -254,15 +254,17 @@
     1. Deploy placeholder services for the public frontend:
 
         ```sh
+        cd frontend
         gcloud run deploy guestbook-frontend-dev \
-            --image gcr.io/cloudrun/hello \
+            --source . \
             --allow-unauthenticated \
             --service-account frontend-dev-identity@$PROJECT_ID.iam.gserviceaccount.com
 
         gcloud run deploy guestbook-frontend-prod \
-            --image gcr.io/cloudrun/hello \
+            --source . \
             --allow-unauthenticated \
             --service-account frontend-prod-identity@$PROJECT_ID.iam.gserviceaccount.com
+        cd ..
         ```
 
         **⚠️ Note:** If your organization doesn’t allow public services, the frontend services may error during deployment. Change flag `--allow-unauthenticated` to `--no-allow-unauthenticated`. However, this means your frontend service will need an authentication header to access.
