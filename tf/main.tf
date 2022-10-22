@@ -12,169 +12,123 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 
+terraform {
+  required_version = ">= 0.13"
+
+  required_providers {
+    google = {
+      version = "~> 4.36"
+      source  = "hashicorp/google"
+    }
+  }
+}
+
+resource "random_id" "suffix" {
+
+  prefix = var.project_name
+  byte_length = 4
+}
+
+resource "google_project" "generated_project" {
+  count           = var.existing_project_id == null ? 1 : 0
+  project_id      = local.gen_project_id
+  name            = local.gen_project_id
+  billing_account = var.google_billing_account
+
+  lifecycle {
+    # ignoring org_id changes allows the project to be created in whatever org
+    # the user is part of by default, without having to explicitly include the
+    # org id in the terraform config.
+    ignore_changes = [org_id]
+    precondition {
+      condition     = var.google_billing_account != null
+      error_message = "If an existing Project ID is not specified, you must provide a billing account that we can use to create one for you"
+    }
+  }
+}
+
+
 provider "google" {
-  project = "PROJECT_ID"
+  project = local.final_project_id
 }
 
-resource "google_project_service" "artifactregistry_googleapis_com" {
-  service = "artifactregistry.googleapis.com"
+data "google_project" "project_info" {
+  project_id = local.final_project_id    
 }
 
-resource "google_project_service" "binaryauthorization_googleapis_com" {
-  service = "binaryauthorization.googleapis.com"
+## Enable Services
+
+resource "google_project_service" "sds_demo_services" {
+  project = local.final_project_id
+  service = "${each.value}.googleapis.com"
+
+  for_each = toset([
+    "artifactregistry",
+    "binaryauthorization",
+    "cloudbuild",
+    "clouddeploy",
+    "container",
+    "containeranalysis",
+    "containerscanning",
+    "containersecurity",
+    "run"
+  ])
 }
 
-resource "google_project_service" "cloudbuild_googleapis_com" {
-  service = "cloudbuild.googleapis.com"
+resource "time_sleep" "wait_for_services" {
+  create_duration = "30s"
+  depends_on = [google_project_service.sds_demo_services]
 }
 
-resource "google_project_service" "clouddeploy_googleapis_com" {
-  service = "clouddeploy.googleapis.com"
-}
-
-resource "google_project_service" "container_googleapis_com" {
-  service = "container.googleapis.com"
-}
-
-resource "google_project_service" "containeranalysis_googleapis_com" {
-  service = "containeranalysis.googleapis.com"
-}
-resource "google_project_service" "containerscanning_googleapis_com" {
-  service = "containerscanning.googleapis.com"
-}
-
-resource "google_project_service" "containersecurity_googleapis_com" {
-  service = "containersecurity.googleapis.com"
-}
-
-resource "google_project_service" "run_googleapis_com" {
-  service = "run.googleapis.com"
-}
+## Artifacts
 
 resource "google_artifact_registry_repository" "containers" {
-  description   = "Docker repository"
+  description   = "SDS Java Demo Docker repository"
   format        = "DOCKER"
-  location      = "us-central1"
+  location      = var.google_cloud_region
   repository_id = "containers"
 }
 
 resource "google_artifact_registry_repository" "guestbook_remote_repo" {
-  description   = "My remote repo"
+  description   = "SDS Java Demo remote repo"
   format        = "MAVEN"
-  location      = "us-central1"
+  location      = var.google_cloud_region
   repository_id = "guestbook-remote-repo"
 }
 
 # Set IAM policy
 resource "google_project_iam_member" "cb_deploy_operator" {
-  project = "your-project-id"
+  project = local.final_project_id
   role    = "roles/clouddeploy.operator"
-  member  = "serviceAccount:PROJECT_NUM@cloudbuild.gserviceaccount.com"
+  member  = format("serviceAccount:%d@cloudbuild.gserviceaccount.com", var.existing_project_id == null ? google_project.generated_project.0.number : data.google_project.project_info.number )
 }
 
 resource "google_project_iam_member" "cb_sa_user" {
-  project = "your-project-id"
+  project = local.final_project_id
   role    = "roles/iam.serviceAccountUser"
-  member  = "serviceAccount:PROJECT_NUM@cloudbuild.gserviceaccount.com"
+  member  = format("serviceAccount:%d@cloudbuild.gserviceaccount.com", var.existing_project_id == null ? google_project.generated_project.0.number : data.google_project.project_info.number)
 }
 
 resource "google_project_iam_member" "cb_container_admin" {
-  project = "your-project-id"
+  project = local.final_project_id
   role    = "roles/container.admin"
-  member  = "serviceAccount:PROJECT_NUM@cloudbuild.gserviceaccount.com"
+  member  = format("serviceAccount:%d@cloudbuild.gserviceaccount.com", var.existing_project_id == null ? google_project.generated_project.0.number : data.google_project.project_info.number)
 }
 
 resource "google_project_iam_member" "default_container_dev" {
-  project = "your-project-id"
+  project = local.final_project_id
   role    = "roles/container.developer"
-  member  = "serviceAccount:PROJECT_NUM-compute@developer.gserviceaccount.com"
+  member  = format("serviceAccount:%d-compute@developer.gserviceaccount.com", var.existing_project_id == null ? google_project.generated_project.0.number : data.google_project.project_info.number)
 }
 
 resource "google_project_iam_member" "default_deploy_runner" {
-  project = "your-project-id"
+  project = local.final_project_id
   role    = "roles/clouddeploy.jobRunner"
-  member  = "serviceAccount:PROJECT_NUM-compute@developer.gserviceaccount.com"
+  member  = format("serviceAccount:%d-compute@developer.gserviceaccount.com", var.existing_project_id == null ? google_project.generated_project.0.number : data.google_project.project_info.number)
 }
 
 resource "google_project_iam_member" "default_ar_reader" {
-  project = "your-project-id"
+  project = local.final_project_id
   role    = "roles/artifactregistry.reader"
-  member  = "serviceAccount:PROJECT_NUM-compute@developer.gserviceaccount.com"
-}
-
-# Set Binary Authorization policy
-resource "google_binary_authorization_policy" "policy" {
-  default_admission_rule {
-    evaluation_mode         = "REQUIRE_ATTESTATION"
-    enforcement_mode        = "ENFORCED_BLOCK_AND_AUDIT_LOG"
-    require_attestations_by = ["projects/PROJECT_ID/attestors/built-by-cloud-build"]
-  }
-
-  global_policy_evaluation_mode = "ENABLE"
-}
-
-# GKE Clusters
-resource "google_container_cluster" "dev_cluster" {
-  name                     = "dev-cluster"
-  location                 = "us-central1"
-  binary_authorization {
-    evaluation_mode = "PROJECT_SINGLETON_POLICY_ENFORCE"
-  }
-
-    enable_autopilot = true
-    ip_allocation_policy {
-  }
-}
-
-resource "google_container_cluster" "prod_cluster" {
-  name                     = "prod-cluster"
-  location                 = "us-central1"
-  binary_authorization {
-    evaluation_mode = "PROJECT_SINGLETON_POLICY_ENFORCE"
-  }
-    enable_autopilot = true
-    ip_allocation_policy {
-  }
-}
-
-# Cloud Deploy
-resource "google_clouddeploy_target" "dev" {
-  location = "us-central1"
-  name     = "dev-cluster"
-  description = "dev cluster"
-
-  gke {
-    cluster = "projects/PROJECT_ID/locations/us-central1/clusters/dev-cluster"
-  }
-  require_approval = false
-}
-
-resource "google_clouddeploy_target" "prod" {
-  location = "us-central1"
-  name     = "prod-cluster"
-  description = "production cluster"
-
-  gke {
-    cluster = "projects/PROJECT_ID/locations/us-central1/clusters/prod-cluster"
-  }
-  require_approval = false
-}
-
-
-resource "google_clouddeploy_delivery_pipeline" "primary" {
-  location = "us-central1"
-  name     = "guestbook-app-delivery"
-  description = "main application pipeline"
-
-  serial_pipeline {
-    stages {
-      profiles  = []
-      target_id = google_clouddeploy_target.dev.name
-    }
-
-    stages {
-      profiles  = []
-      target_id = google_clouddeploy_target.prod.name
-    }
-  }
+  member  = format("serviceAccount:%d-compute@developer.gserviceaccount.com", var.existing_project_id == null ? google_project.generated_project.0.number : data.google_project.project_info.number)
 }
