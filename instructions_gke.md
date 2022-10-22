@@ -232,12 +232,18 @@
     gcloud artifacts files list --repository=guestbook-remote-repo
     ```
 
+1. View artifact deployed to the **Artifact Registry Maven repository**:
+
+    ```sh
+    gcloud artifacts packages list --repository=guestbook-maven-repo --location=us-central1
+    ```
+
 1. View **[GKE Security Postures](https://cloud.google.com/software-supply-chain-security/docs/sds/deploy-gke-view-security-insights)**:
     * [Navigate to the GKE security posture management UI](https://console.cloud.google.com/kubernetes/security/dashboard)
     * View the cluster concerns and vulnerabilities
 
 1. Deploy the release to production via **Cloud Deploy**:
-    * [Navigate to the Cloud Deploy pipeline](https://console.cloud.google.com/deploy/delivery-pipelines/us-central1/cloudrun-guestbook-backend-delivery)
+    * [Navigate to the Cloud Deploy pipeline](https://console.cloud.google.com/deploy/delivery-pipelines/us-central1/guestbook-app-delivery)
     * Click "Promote"
 
 ### Test the Binary Authorization policy
@@ -266,9 +272,9 @@ a locally built container.
     export _BACKEND_IMAGE=us-central1-docker.pkg.dev/$PROJECT_ID/containers/java-guestbook-backend:blocked
 
     gcloud deploy releases create release-blocked \
-    --region us-central1 \
-    --delivery-pipeline=guestbook-app-delivery \
-    --images=java-guestbook-frontend=${_FRONTEND_IMAGE},java-guestbook-backend=${_BACKEND_IMAGE}
+        --region us-central1 \
+        --delivery-pipeline=guestbook-app-delivery \
+        --images=java-guestbook-frontend=${_FRONTEND_IMAGE},java-guestbook-backend=${_BACKEND_IMAGE}
     ```
 
 
