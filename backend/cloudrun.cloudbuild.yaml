@@ -1,0 +1,49 @@
+# Copyright 2022 Google LLC
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+# This file is used in the quickstart.
+
+steps:
+
+  - id: "Build and Push Container Image: Backend"
+    name: "gcr.io/cloud-builders/docker"
+    entrypoint: "/bin/bash"
+    args:
+      - "-c"
+      - |
+        docker build -t $_BACKEND_IMAGE .
+        docker push $_BACKEND_IMAGE
+        
+  - id: "Create Cloud Deploy Release"
+    name: "gcr.io/cloud-builders/gcloud:latest"
+    entrypoint: /bin/bash
+    args:
+      - "-xe"
+      - "-c"
+      - |
+        gcloud deploy releases create backend-release-${SHORT_SHA} \
+          --region $_REGION \
+          --delivery-pipeline=cloudrun-guestbook-backend-delivery \
+          --skaffold-file=./backend/cloudrun.skaffold.yaml \
+          --images=java-guestbook-backend=$_BACKEND_IMAGE:${SHORT_SHA}
+          
+images:
+  - $_BACKEND_IMAGE
+
+substitutions:
+  _BACKEND_IMAGE: 'us-central1-docker.pkg.dev/${PROJECT_ID}/containers/java-guestbook-backend:quickstart'
+
+options:
+  dynamic_substitutions: true
+  requestedVerifyOption: VERIFIED
