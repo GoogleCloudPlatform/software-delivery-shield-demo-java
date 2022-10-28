@@ -24,6 +24,21 @@ steps:
       - |
         docker build -t $_BACKEND_IMAGE .
         docker push $_BACKEND_IMAGE
+  
+  - id: "Create Cloud Deploy Release"
+    name: "gcr.io/cloud-builders/gcloud:latest"
+    entrypoint: /bin/bash
+    args:
+      - "-xe"
+      - "-c"
+      - |
+        # Retrieve image SHAs
+        backend_sha=$(gcloud artifacts docker images describe $_BACKEND_IMAGE:$SHORT_SHA --format="value(image_summary.digest)")
+        # Create Cloud Deploy release with new images
+        gcloud deploy releases create release-${SHORT_SHA} \
+          --region $_REGION \
+          --delivery-pipeline=guestbook-app-delivery \
+          --images=java-guestbook-backend=${_BACKEND_IMAGE}@$backend_sha
 
 images:
   - $_BACKEND_IMAGE
