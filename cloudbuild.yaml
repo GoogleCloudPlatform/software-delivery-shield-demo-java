@@ -23,7 +23,7 @@ steps:
     - "-xe"
     - "-c"
     - |
-      sed -i "s/PROJECT_ID/${PROJECT_ID}/g" **/pom.xml
+      sed -i "s/\/PROJECT_ID/\/${PROJECT_ID}/g" pom.xml **/pom.xml
 
   - id: "Cache Maven Dependencies in an Artifact Registry Remote Repo"
     name: gcr.io/cloud-builders/mvn

@@ -13,9 +13,9 @@
     <module>guestbook-pojo</module>
   </modules>
 
+  <repositories>
   <!-- Artifact Registry remote repository -->
-  <!-- <repositories>
-    <repository>
+    <!-- <repository>
       <id>central</id>
       <name>Maven Central remote repository</name>
       <url>artifactregistry://us-central1-maven.pkg.dev/PROJECT_ID/guestbook-remote-repo</url>
@@ -26,8 +26,20 @@
       <snapshots>
         <enabled>true</enabled>
       </snapshots>
+    </repository> -->
+    <!-- Artifact Registry Maven repository -->
+    <repository>
+      <id>artifact-registry</id>
+      <url>artifactregistry://us-central1-maven.pkg.dev/PROJECT_ID/guestbook-maven-repo</url>
+      <layout>default</layout>
+      <releases>
+        <enabled>true</enabled>
+      </releases>
+      <snapshots>
+        <enabled>true</enabled>
+      </snapshots>
     </repository>
-  </repositories> -->
+  </repositories>
   
   <build>
     <pluginManagement>
