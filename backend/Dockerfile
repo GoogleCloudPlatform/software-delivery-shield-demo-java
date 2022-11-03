@@ -12,27 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# Use maven to compile the java application.
-# https://hub.docker.com/_/maven
-# FROM maven:3-eclipse-temurin-17-alpine AS build-env
-
-# # Set the working directory to /app
-# WORKDIR /app
-
-# # copy the pom.xml file to download dependencies
-# COPY pom.xml ./
-
-# # Copy the rest of the working directory contents into the container
-# COPY . ./
-
-# # Compile the application.
-# RUN mvn package -DskipTests
-
-# Build runtime image.
+# Use the Eclipse Temurin base image.
 FROM eclipse-temurin:17-jre
 
-# Copy the compiled files over.
-# COPY --from=build-env /app/target /app/
+# Copy the packaged files over.
 COPY /target /app/
 
 # Starts java app with debugging server at port 5005.
