@@ -1,0 +1,81 @@
+# Copyright 2022 Google LLC
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+# This file is used in the full demo for the deployment of the Frontend and
+# Backend services to Cloud Run via Cloud Deploy
+
+steps:
+  - id: "Clean up previous runs"
+    name: "gcr.io/cloud-builders/gcloud:latest"
+    entrypoint: /bin/bash
+    args:
+    - "-xe"
+    - "-c"
+    - |
+      gcloud artifacts repositories delete guestbook-remote-repo --location us-central1 --quiet || echo "oops"
+      gcloud artifacts repositories delete guestbook-maven-repo --location us-central1 --quiet || echo "oops"
+
+      gcloud artifacts repositories create guestbook-maven-repo \
+        --repository-format=maven \
+        --location=us-central1 \
+        --description="My Maven repo" 
+
+      gcloud artifacts repositories create guestbook-remote-repo \
+          --repository-format=maven \
+          --location=us-central1 \
+          --description="My remote repo" \
+          --mode=remote-repository \
+          --remote-repo-config-desc="Maven Central" \
+          --remote-mvn-repo=MAVEN-CENTRAL
+
+
+  - id: "Add Project ID to files"
+    name: "gcr.io/cloud-builders/gcloud:latest"
+    entrypoint: /bin/bash
+    args:
+    - "-xe"
+    - "-c"
+    - |
+      sed -i "s/\/PROJECT_ID/\/${PROJECT_ID}/g" pom.xml 
+
+  - id: "Run Demo Cloud Build"
+    name: "gcr.io/cloud-builders/gcloud:latest"
+    entrypoint: /bin/bash
+    args:
+    - "-xe"
+    - "-c"
+    - |
+      gcloud builds submit --config cloudbuild.yaml \
+        --region us-central1 \
+        --substitutions SHORT_SHA=$SHORT_SHA \
+
+  - id: "Check"
+    name: "gcr.io/cloud-builders/gcloud:latest"
+    entrypoint: /bin/bash
+    args:
+    - "-xe"
+    - "-c"
+    - |
+      # Ensure container images
+      gcloud artifacts docker images describe us-central1-docker.pkg.dev/${PROJECT_ID}/containers/java-guestbook-frontend
+      gcloud artifacts docker images describe us-central1-docker.pkg.dev/${PROJECT_ID}/containers/java-guestbook-backend
+      
+      # Ensure Maven repos
+      gcloud artifacts packages list --repository guestbook-remote-repo --location us-central1
+      gcloud artifacts packages describe com.example.guestbook:java-guestbook-pojo --repository guestbook-maven-repo --location us-central1
+     
+      # Ensure Cloud Deploy rollout 
+      gcloud deploy rollouts list --delivery-pipeline guestbook-app-delivery --region us-central1 --release release-${SHORT_SHA} --format='value(state)'
+
+
