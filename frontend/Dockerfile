@@ -13,25 +13,26 @@
 # limitations under the License.
 
 # Use maven to compile the java application.
-FROM maven:3-eclipse-temurin-17-alpine AS build-env
+# FROM maven:3-eclipse-temurin-17-alpine AS build-env
 
-# Set the working directory to /app
-WORKDIR /app
+# # Set the working directory to /app
+# WORKDIR /app
 
-# copy the pom.xml file to download dependencies
-COPY pom.xml ./
+# # copy the pom.xml file to download dependencies
+# COPY pom.xml ./
 
-# Copy the rest of the working directory contents into the container
-COPY . ./
+# # Copy the rest of the working directory contents into the container
+# COPY . ./
 
-# Compile the application.
-RUN mvn -Dmaven.test.skip=true package
+# # Compile the application.
+# RUN mvn -Dmaven.test.skip=true package
 
 # Build runtime image.
 FROM eclipse-temurin:17-jre
 
 # Copy the compiled files over.
-COPY --from=build-env /app/target /app/
+# COPY --from=build-env /app/target /app/
+COPY /target /app/
 
 # Starts java app with debugging server at port 5005.
 ENTRYPOINT ["java", "-jar", "/app/frontend-1.0.jar"]

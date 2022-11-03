@@ -8,6 +8,12 @@
   <name>Guestbook Frontend</name>
   <version>1.0</version>
 
+  <parent>
+    <groupId>com.example.guestbook</groupId>
+    <artifactId>java-guestbook</artifactId>
+    <version>1.0</version>
+  </parent>
+
   <properties>
     <maven.compiler.source>11</maven.compiler.source>
     <maven.compiler.target>11</maven.compiler.target>
@@ -15,17 +21,6 @@
   </properties>
 
   <!-- Internal dependencies stored in Artifact Registry -->
-  <distributionManagement>
-    <snapshotRepository>
-      <id>artifact-registry</id>
-      <url>artifactregistry://us-central1-maven.pkg.dev/PROJECT_ID/guestbook-maven-repo</url>
-    </snapshotRepository>
-    <repository>
-      <id>artifact-registry</id>
-      <url>artifactregistry://us-central1-maven.pkg.dev/PROJECT_ID/guestbook-maven-repo</url>
-    </repository>
-  </distributionManagement>
-
   <repositories>
     <repository>
       <id>artifact-registry</id>
@@ -45,7 +40,7 @@
       <dependency>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-dependencies</artifactId>
-        <version>2.7.4</version>
+        <version>2.7.5</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
@@ -82,7 +77,7 @@
     <dependency>
       <groupId>com.google.auth</groupId>
       <artifactId>google-auth-library-oauth2-http</artifactId>
-      <version>1.11.0</version>
+      <version>1.12.1</version>
     </dependency>
 
     <dependency>
@@ -107,6 +102,7 @@
       <plugin>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-maven-plugin</artifactId>
+        <version>2.7.5</version>
         <executions>
           <execution>
             <goals>
@@ -128,12 +124,5 @@
       </plugin>
     </plugins>
 
-    <extensions>
-      <extension>
-        <groupId>com.google.cloud.artifactregistry</groupId>
-        <artifactId>artifactregistry-maven-wagon</artifactId>
-        <version>2.1.5</version>
-      </extension>
-    </extensions>
   </build>
 </project>

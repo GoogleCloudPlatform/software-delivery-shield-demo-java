@@ -207,7 +207,7 @@
 1. Submit the Cloud Build config:
 
     ```sh
-    gcloud builds submit --config cloudrun.cloudbuild.yaml --substitutions SHORT_SHA=1234 --region us-central1
+    gcloud builds submit --config cloudrun.cloudbuild.yaml --region us-central1 --substitutions SHORT_SHA=1234 
     ```
 
     The build does the following:

@@ -8,11 +8,18 @@
   <name>Guestbook Backend</name>
   <version>1.0</version>
 
+  <parent>
+    <groupId>com.example.guestbook</groupId>
+    <artifactId>java-guestbook</artifactId>
+    <version>1.0</version>
+  </parent>
+
   <properties>
     <maven.compiler.source>11</maven.compiler.source>
     <maven.compiler.target>11</maven.compiler.target>
     <bootstrap.version>4.2.1</bootstrap.version>
   </properties>
+
 
   <!-- Import dependency management from Spring Boot -->
   <dependencyManagement>
@@ -20,7 +27,7 @@
       <dependency>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-dependencies</artifactId>
-        <version>2.7.4</version>
+        <version>2.7.5</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
@@ -32,23 +39,9 @@
     <dependency>
       <groupId>com.google.code.gson</groupId>
       <artifactId>gson</artifactId>
-      <version>2.8.8</version>
+      <version>2.10</version>
     </dependency>
 
-    <dependency>
-      <groupId>org.springframework.boot</groupId>
-      <artifactId>spring-boot-starter-data-jpa</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>com.h2database</groupId>
-      <artifactId>h2</artifactId>
-      <scope>runtime</scope>
-    </dependency>
-    <dependency>
-      <groupId>javax.persistence</groupId>
-      <artifactId>javax.persistence-api</artifactId>
-      <version>2.2</version>
-    </dependency>
     <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-web</artifactId>
@@ -64,10 +57,25 @@
       <artifactId>snakeyaml</artifactId>
       <version>1.33</version>
     </dependency>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-data-jpa</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.h2database</groupId>
+      <artifactId>h2</artifactId>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>javax.persistence</groupId>
+      <artifactId>javax.persistence-api</artifactId>
+      <version>2.2</version>
+    </dependency>
 
     <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-test</artifactId>
+      <version>2.7.5</version>
       <scope>test</scope>
     </dependency>
   </dependencies>
@@ -80,13 +88,14 @@
         <version>3.3.0</version>
         <configuration>
           <to>
-            <image>us-central1-docker.pkg.dev/${PROJECT_ID}/containers/java-guestbook-backend:jib</image>
+            <image>us-central1-docker.pkg.dev/${env.PROJECT_ID}/containers/java-guestbook-backend:jib</image>
           </to>
         </configuration>
       </plugin>
       <plugin>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-maven-plugin</artifactId>
+        <version>2.7.5</version>
         <executions>
           <execution>
             <goals>

@@ -53,7 +53,7 @@ public class FrontendController {
       if (System.getenv("K_SERVICE") != null) {
         HttpHeaders headers = new HttpHeaders();
         headers.set("Authorization", "Bearer " + getIdToken(backendUri));
-        HttpEntity entity = new HttpEntity<>(headers);
+        HttpEntity<String> entity = new HttpEntity<>(headers);
         response =
             restTemplate
                 .exchange(backendUri, HttpMethod.GET, entity, GuestBookEntry[].class)

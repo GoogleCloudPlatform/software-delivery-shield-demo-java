@@ -7,6 +7,12 @@
   <name>Guestbook POJO</name>
   <version>1.0</version>
 
+  <parent>
+    <groupId>com.example.guestbook</groupId>
+    <artifactId>java-guestbook</artifactId>
+    <version>1.0</version>
+  </parent>
+
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <maven.compiler.source>11</maven.compiler.source>
@@ -24,20 +30,6 @@
       <url>artifactregistry://us-central1-maven.pkg.dev/PROJECT_ID/guestbook-maven-repo</url>
     </repository>
   </distributionManagement>
-
-  <repositories>
-    <repository>
-      <id>artifact-registry</id>
-      <url>artifactregistry://us-central1-maven.pkg.dev/PROJECT_ID/guestbook-maven-repo</url>
-      <layout>default</layout>
-      <releases>
-        <enabled>true</enabled>
-      </releases>
-      <snapshots>
-        <enabled>true</enabled>
-      </snapshots>
-    </repository>
-  </repositories>
 
   <dependencies>
     <dependency>
@@ -66,13 +58,5 @@
         </configuration>
       </plugin>
     </plugins>
-    
-    <extensions>
-      <extension>
-        <groupId>com.google.cloud.artifactregistry</groupId>
-        <artifactId>artifactregistry-maven-wagon</artifactId>
-        <version>2.1.5</version>
-      </extension>
-    </extensions>
   </build>
 </project>
