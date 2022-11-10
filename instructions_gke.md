@@ -82,11 +82,11 @@
 1. Replace PROJECT_ID placeholder with your Project Id:
     * MacOS
         ```sh
-        sed -i '.bak' "s/PROJECT_ID/$PROJECT_ID/g" **/*clouddeploy.yaml policy.yaml pom.xml
+        sed -i '.bak' "s/PROJECT_ID/$PROJECT_ID/g" **/*clouddeploy.yaml clouddeploy.yaml policy.yaml pom.xml
         ```
     * Linux
         ```sh
-        sed -i "s/PROJECT_ID/$PROJECT_ID/g" **/*clouddeploy.yaml policy.yaml pom.xml
+        sed -i "s/PROJECT_ID/$PROJECT_ID/g" **/*clouddeploy.yaml clouddeploy.yaml policy.yaml pom.xml
         ```
 
 ### Setup
