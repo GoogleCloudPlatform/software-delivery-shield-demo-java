@@ -54,9 +54,10 @@ public class GuestbookIT {
     @BeforeAll
     public static void init() {
         projectId = System.getenv("PROJECT_ID");
-        release = "release-" + System.getenv("SHORT_SHA");
         assertThat(projectId).isNotNull();
-        assertThat(System.getenv("SHORT_SHA")).isNotNull();
+        String shortSha = System.getenv("SHORT_SHA");
+        assertThat(shortSha).isNotNull();
+        release = "release-" + shortSha;
     }
 
     @Test
