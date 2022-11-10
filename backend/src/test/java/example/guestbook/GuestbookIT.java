@@ -114,11 +114,12 @@ public class GuestbookIT {
                 if (finished) {
                     assertThat(rollout.getState()).isEqualTo(Rollout.State.SUCCEEDED);
                 } else {
-                    System.out.println("- Waiting for rollout");
+                    System.out.println("Waiting for rollout: " + rollout.getState());
                     Thread.sleep(backoffDelay);
                     backoffTime += backoffDelay;
                     backoffDelay *= 2; // Double the delay to provide exponential backoff.
                 }
+                rollout = cloudDeployClient.getRollout(rollout.getName());
             }
             assertThat(rollout.getState()).isEqualTo(Rollout.State.SUCCEEDED);
         }
@@ -132,27 +133,30 @@ public class GuestbookIT {
             ListOccurrencesPagedResponse occurences = grafeasClient
                     .listOccurrences(ProjectName.of(projectId), "");
 
-            // List<Occurrence> frontendFiltered = StreamSupport
-            // .stream(occurences.getPage().iterateAll().spliterator(), false)
-            // .filter(occ -> occ.getResourceUri().contains(frontendImage)
-            // && occ.getBuild().getProvenance() != null)
-            // .collect(Collectors.toList());
+            List<Occurrence> frontendFiltered = StreamSupport
+                    .stream(occurences.getPage().iterateAll().spliterator(), false)
+                    .filter(occ -> occ.getResourceUri().contains(frontendImage)
+                            && occ.getBuild().getProvenance() != null)
+                    .collect(Collectors.toList());
 
-            // List<Occurrence> backendFiltered = StreamSupport
-            // .stream(occurences.iterateAll().spliterator(), false)
-            // .filter(occ -> occ.getResourceUri().contains(backendImage)
-            // && occ.getBuild().getProvenance() != null)
-            // .collect(Collectors.toList());
+            List<Occurrence> backendFiltered = StreamSupport
+                    .stream(occurences.iterateAll().spliterator(), false)
+                    .filter(occ -> occ.getResourceUri().contains(backendImage)
+                            && occ.getBuild().getProvenance() != null)
+                    .collect(Collectors.toList());
 
-            // List<Occurrence> mvnFiltered = StreamSupport
-            // .stream(occurences.iterateAll().spliterator(), false)
-            // .filter(occ -> occ.getResourceUri().contains(mavenArtifact)
-            // && occ.getBuild().getProvenance() != null)
-            // .collect(Collectors.toList());
+            List<Occurrence> mvnFiltered = StreamSupport
+                    .stream(occurences.iterateAll().spliterator(), false)
+                    .filter(occ -> occ.getResourceUri().contains(mavenArtifact)
+                            && occ.getBuild().getProvenance() != null)
+                    .collect(Collectors.toList());
 
-            // assertThat(frontendFiltered).isNotEmpty();
-            // assertThat(backendFiltered).isNotEmpty();
-            // assertThat(mvnFiltered).isNotEmpty();
+            System.out.println(frontendFiltered);
+            System.out.println(backendFiltered);
+            System.out.println(mvnFiltered);
+            assertThat(frontendFiltered).isNotEmpty();
+            assertThat(backendFiltered).isNotEmpty();
+            assertThat(mvnFiltered).isNotEmpty();
         }
     }
 }
