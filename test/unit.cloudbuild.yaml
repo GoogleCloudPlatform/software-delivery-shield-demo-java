@@ -13,6 +13,10 @@
 # limitations under the License.
 
 steps:
+  - id: "Run Linter"
+    name: "gcr.io/cloud-builders/mvn:latest"
+    args: ["checkstyle:check"]
+
   - id: "Run Unit Tests"
-    name: "gcr.io/cloud-builders/mvn"
-    args: ["verify"]
+    name: "gcr.io/cloud-builders/mvn:latest"
+    args: ["verify", '-Dtest=\!IntegrationTest', "-pl=backend"]

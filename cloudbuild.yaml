@@ -41,7 +41,7 @@ steps:
 
   - id: "Build Maven Project"
     name: "gcr.io/cloud-builders/mvn"
-    args: ["deploy"]
+    args: ["package"]
 
   - id: "Build and Push Container Image: Frontend"
     name: "gcr.io/cloud-builders/docker"

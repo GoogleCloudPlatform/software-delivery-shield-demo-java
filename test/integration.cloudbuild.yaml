@@ -51,8 +51,10 @@ steps:
     - |
       gcloud artifacts repositories delete guestbook-remote-repo \
         --location us-central1 --quiet || echo "Artifact Registry repository does not exist"
+      
       gcloud artifacts repositories delete guestbook-maven-repo \
         --location us-central1 --quiet || echo "Artifact Registry repository does not exist"
+      
       gcloud artifacts repositories delete containers \
         --location us-central1 --quiet || echo "Artifact Registry repository does not exist"
 
@@ -92,45 +94,48 @@ steps:
         --region us-central1 \
         --substitutions SHORT_SHA=$SHORT_SHA \
 
-  - id: "Test: Container images"
-    name: "gcr.io/cloud-builders/gcloud:latest"
-    entrypoint: /bin/bash
-    args:
-    - "-xe"
-    - "-c"
-    - |
-      gcloud artifacts docker images describe \
-        us-central1-docker.pkg.dev/${PROJECT_ID}/containers/java-guestbook-frontend:${SHORT_SHA}
-      gcloud artifacts docker images describe \
-        us-central1-docker.pkg.dev/${PROJECT_ID}/containers/java-guestbook-backend:${SHORT_SHA}
+  - id: "Run Integration Tests"
+    name: "gcr.io/cloud-builders/mvn:latest"
+    args: ["verify"]
+  # - id: "Test: Container images"
+  #   name: "gcr.io/cloud-builders/gcloud:latest"
+  #   entrypoint: /bin/bash
+  #   args:
+  #   - "-xe"
+  #   - "-c"
+  #   - |
+  #     gcloud artifacts docker images describe \
+  #       us-central1-docker.pkg.dev/${PROJECT_ID}/containers/java-guestbook-frontend:${SHORT_SHA}
+  #     gcloud artifacts docker images describe \
+  #       us-central1-docker.pkg.dev/${PROJECT_ID}/containers/java-guestbook-backend:${SHORT_SHA}
       
 
-  - id: "Test: Artifact Registry repos"
-    name: "gcr.io/cloud-builders/gcloud:latest"
-    entrypoint: /bin/bash
-    args:
-    - "-xe"
-    - "-c"
-    - |
-      # TODO: eval packages vs files
-      gcloud artifacts packages list --repository guestbook-remote-repo \
-        --location us-central1
+  # - id: "Test: Artifact Registry repos"
+  #   name: "gcr.io/cloud-builders/gcloud:latest"
+  #   entrypoint: /bin/bash
+  #   args:
+  #   - "-xe"
+  #   - "-c"
+  #   - |
+  #     # TODO: eval packages vs files
+  #     gcloud artifacts packages list --repository guestbook-remote-repo \
+  #       --location us-central1
 
-      gcloud artifacts packages describe com.example.guestbook:java-guestbook-pojo \
-      --repository guestbook-maven-repo \
-      --location us-central1
+  #     gcloud artifacts packages describe com.example.guestbook:java-guestbook-pojo \
+  #     --repository guestbook-maven-repo \
+  #     --location us-central1
 
-  - id: "Test: Cloud Deploy rollout"
-    name: "gcr.io/cloud-builders/gcloud:latest"
-    entrypoint: /bin/bash
-    args:
-    - "-xe"
-    - "-c"
-    - |
-      gcloud deploy rollouts list \
-        --delivery-pipeline guestbook-app-delivery \
-        --region us-central1 \
-        --release release-${SHORT_SHA} \
-        --format='value(state)'
+  # - id: "Test: Cloud Deploy rollout"
+  #   name: "gcr.io/cloud-builders/gcloud:latest"
+  #   entrypoint: /bin/bash
+  #   args:
+  #   - "-xe"
+  #   - "-c"
+  #   - |
+  #     gcloud deploy rollouts list \
+  #       --delivery-pipeline guestbook-app-delivery \
+  #       --region us-central1 \
+  #       --release release-${SHORT_SHA} \
+  #       --format='value(state)'
 
 
