@@ -77,6 +77,7 @@ steps:
         # Create Cloud Deploy release with new images
         gcloud deploy releases create release-${SHORT_SHA} \
           --region $_REGION \
+          --project $PROJECT_ID \
           --delivery-pipeline=guestbook-app-delivery \
           --images=java-guestbook-frontend=${_FRONTEND_IMAGE}@$frontend_sha,java-guestbook-backend=${_BACKEND_IMAGE}@$backend_sha
 
