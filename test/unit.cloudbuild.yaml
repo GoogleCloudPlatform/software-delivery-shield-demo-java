@@ -13,10 +13,21 @@
 # limitations under the License.
 
 steps:
+  - id: "Set up: Project files"
+    name: "gcr.io/cloud-builders/gcloud:latest"
+    entrypoint: /bin/bash
+    args:
+    - "-xe"
+    - "-c"
+    - |
+      sed -i "s/\/PROJECT_ID/\/${PROJECT_ID}/g" pom.xml
+      sed -i "s/<\!-- <repositories>/<repositories>/g" pom.xml
+      sed -i "s/<\/repositories> -->/<\/repositories>/g" pom.xml
+
   - id: "Run Linter"
     name: "gcr.io/cloud-builders/mvn:latest"
     args: ["checkstyle:check"]
 
   - id: "Run Unit Tests"
     name: "gcr.io/cloud-builders/mvn:latest"
-    args: ["verify", "-Dtest=!IntegrationTest", "-pl=backend"]
+    args: ["verify", "-DskipITs"]

@@ -96,7 +96,7 @@ steps:
 
   - id: "Run Integration Tests"
     name: "gcr.io/cloud-builders/mvn:latest"
-    args: ["verify"]
+    args: ["verify", "-Dtest=GuestbookIT", "-pl=backend"]
   # - id: "Test: Container images"
   #   name: "gcr.io/cloud-builders/gcloud:latest"
   #   entrypoint: /bin/bash

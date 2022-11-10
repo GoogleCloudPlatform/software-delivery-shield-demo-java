@@ -37,7 +37,7 @@ import com.google.devtools.artifactregistry.v1.GetDockerImageRequest;
 import com.google.devtools.artifactregistry.v1.ListPackagesResponse;
 import com.google.devtools.artifactregistry.v1.Package;
 
-public class IntegrationTest {
+public class GuestbookIT {
     final static String projectId = System.getenv("PROJECT_ID");
     final String location = "us-central1";
     final String remoteRepo = "guestbook-remote-repo";
