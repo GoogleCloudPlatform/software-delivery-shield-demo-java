@@ -19,4 +19,4 @@ steps:
 
   - id: "Run Unit Tests"
     name: "gcr.io/cloud-builders/mvn:latest"
-    args: ["verify", '-Dtest=\!IntegrationTest', "-pl=backend"]
+    args: ["verify", "-Dtest=!IntegrationTest", "-pl=backend"]
