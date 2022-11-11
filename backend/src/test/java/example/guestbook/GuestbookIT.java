@@ -149,9 +149,6 @@ public class GuestbookIT {
                             && occ.getBuild().getProvenance() != null)
                     .collect(Collectors.toList());
 
-            System.out.println(frontendFiltered);
-            System.out.println(backendFiltered);
-            System.out.println(mvnFiltered);
             assertThat(frontendFiltered).isNotEmpty();
             assertThat(backendFiltered).isNotEmpty();
             assertThat(mvnFiltered).isNotEmpty();
