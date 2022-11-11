@@ -135,8 +135,14 @@
 1. Create GKE clusters with **Binary Authorization** enabled:
 
     ```sh
-    gcloud container clusters create-auto dev-cluster --region=us-central1 --binauthz-evaluation-mode=PROJECT_SINGLETON_POLICY_ENFORCE && \
-    gcloud container clusters create-auto prod-cluster --region=us-central1 --binauthz-evaluation-mode=PROJECT_SINGLETON_POLICY_ENFORCE
+    gcloud container clusters create-auto dev-cluster \
+        --region=us-central1 \
+        --binauthz-evaluation-mode=PROJECT_SINGLETON_POLICY_ENFORCE \
+        --enable-workload-vulnerability-scanning && \
+    gcloud container clusters create-auto prod-cluster \
+        --region=us-central1 \
+        --binauthz-evaluation-mode=PROJECT_SINGLETON_POLICY_ENFORCE \
+        --enable-workload-vulnerability-scanning
     ```
 
 1. Create your **Cloud Deploy** delivery pipeline and targets:

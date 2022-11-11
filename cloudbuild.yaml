@@ -25,6 +25,10 @@ steps:
     - |
       sed -i "s/\/PROJECT_ID/\/${PROJECT_ID}/g" pom.xml **/pom.xml
 
+  - id: "Cache Maven Dependencies in an Artifact Registry Remote Repo"
+    name: gcr.io/cloud-builders/mvn
+    args: ["compile"]
+
   - id: "Build Maven Artifact"
     name: "gcr.io/cloud-builders/mvn"
     dir: "guestbook-pojo"
@@ -34,10 +38,6 @@ steps:
     - "-c"
     - |
       mvn deploy || echo "Artifact may already exist"
-
-  - id: "Cache Maven Dependencies in an Artifact Registry Remote Repo"
-    name: gcr.io/cloud-builders/mvn
-    args: ["compile"]
 
   - id: "Build Maven Project"
     name: "gcr.io/cloud-builders/mvn"
