@@ -1,0 +1,7 @@
+allowedCopyrightHolders:
+  - 'Google LLC'
+allowedLicenses:
+  - 'Apache-2.0'
+sourceFileExtensions:
+  - 'java'
+  - 'yaml'
