@@ -82,11 +82,11 @@
 1. Replace PROJECT_ID placeholder with your Project Id:
     * MacOS
         ```sh
-        sed -i '.bak' "s/PROJECT_ID/$PROJECT_ID/g" **/*clouddeploy.yaml policy.yaml pom.xml
+        sed -i '.bak' "s/PROJECT_ID/$PROJECT_ID/g" **/*clouddeploy.yaml clouddeploy.yaml policy.yaml pom.xml
         ```
     * Linux
         ```sh
-        sed -i "s/PROJECT_ID/$PROJECT_ID/g" **/*clouddeploy.yaml policy.yaml pom.xml
+        sed -i "s/PROJECT_ID/$PROJECT_ID/g" **/*clouddeploy.yaml clouddeploy.yaml policy.yaml pom.xml
         ```
 
 ### Setup
@@ -135,8 +135,14 @@
 1. Create GKE clusters with **Binary Authorization** enabled:
 
     ```sh
-    gcloud container clusters create-auto dev-cluster --region=us-central1 --binauthz-evaluation-mode=PROJECT_SINGLETON_POLICY_ENFORCE && \
-    gcloud container clusters create-auto prod-cluster --region=us-central1 --binauthz-evaluation-mode=PROJECT_SINGLETON_POLICY_ENFORCE
+    gcloud container clusters create-auto dev-cluster \
+        --region=us-central1 \
+        --binauthz-evaluation-mode=PROJECT_SINGLETON_POLICY_ENFORCE \
+        --enable-workload-vulnerability-scanning && \
+    gcloud container clusters create-auto prod-cluster \
+        --region=us-central1 \
+        --binauthz-evaluation-mode=PROJECT_SINGLETON_POLICY_ENFORCE \
+        --enable-workload-vulnerability-scanning
     ```
 
 1. Create your **Cloud Deploy** delivery pipeline and targets:
