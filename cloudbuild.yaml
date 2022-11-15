@@ -34,31 +34,29 @@ steps:
     - "-c"
     - |
       mvn deploy || echo "Artifact may already exist"
-  # - id: "Build Maven Project"
-  #   name: "gcr.io/cloud-builders/mvn"
-  #   args: ["package"]
 
   - id: "Cache Maven Dependencies in an Artifact Registry Remote Repo"
     name: gcr.io/cloud-builders/mvn
     args: ["compile"]
 
-
   - id: "Build and Push Container Image: Frontend"
     name: "gcr.io/cloud-builders/docker"
     entrypoint: "/bin/bash"
+    dir: frontend
     args:
       - "-c"
       - |
-        docker build --network=cloudbuild -f frontend/Dockerfile -t $_FRONTEND_IMAGE:$SHORT_SHA . 
+        docker build --network=cloudbuild -t $_FRONTEND_IMAGE:$SHORT_SHA . 
         docker push $_FRONTEND_IMAGE:$SHORT_SHA
 
   - id: "Build and Push Container Image: Backend"
     name: "gcr.io/cloud-builders/docker"
     entrypoint: "/bin/bash"
+    dir: backend
     args:
       - "-c"
       - |
-        docker build -f backend/Dockerfile -t $_BACKEND_IMAGE:$SHORT_SHA .
+        docker build -t $_BACKEND_IMAGE:$SHORT_SHA .
         docker push $_BACKEND_IMAGE:$SHORT_SHA
 
   - id: "Create Cloud Deploy Release"

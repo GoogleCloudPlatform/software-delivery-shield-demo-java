@@ -77,6 +77,11 @@
             --member=serviceAccount:$(gcloud projects describe $PROJECT_ID \
             --format="value(projectNumber)")-compute@developer.gserviceaccount.com \
             --role="roles/iam.serviceAccountUser"
+
+        gcloud projects add-iam-policy-binding $PROJECT_ID \
+            --member=serviceAccount:$(gcloud projects describe $PROJECT_ID \
+            --format="value(projectNumber)")-compute@developer.gserviceaccount.com \
+            --role="roles/container.admin"
         ```
 
 1. Replace PROJECT_ID placeholder with your Project Id:

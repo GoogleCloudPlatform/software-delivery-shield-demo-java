@@ -39,23 +39,32 @@ import org.junit.jupiter.api.Test;
 
 public class GuestbookIT {
     static String projectId;
-    final String location = "us-central1";
-    final String remoteRepo = "guestbook-remote-repo";
-    final String mavenRepo = "guestbook-maven-repo";
-    final String containerRepo = "containers";
+    static String location = "us-central1";
+    static String remoteRepo;
+    static String mavenRepo;
+    static String containerRepo;
+    static String pipeline;
+    static String release;
     final String frontendImage = "java-guestbook-frontend";
     final String backendImage = "java-guestbook-backend";
     final String mavenArtifact = "com.example.guestbook:java-guestbook-pojo";
-    final String pipeline = "guestbook-app-delivery";
-    static String release;
 
     @BeforeAll
     public static void init() {
         projectId = System.getenv("PROJECT_ID");
         assertThat(projectId).isNotNull();
+
         String shortSha = System.getenv("SHORT_SHA");
         assertThat(shortSha).isNotNull();
         release = "release-" + shortSha;
+
+        remoteRepo = System.getenv().getOrDefault("REMOTE_REPO", "guestbook-remote-repo");
+
+        mavenRepo = System.getenv().getOrDefault("MAVEN_REPO", "guestbook-maven-repo");
+
+        containerRepo = System.getenv().getOrDefault("CONTAINERS", "containers");
+
+        pipeline = System.getenv().getOrDefault("PIPELINE", "guestbook-app-delivery");
     }
 
     @Test
@@ -70,19 +79,21 @@ public class GuestbookIT {
 
     @Test
     public void verifyArtifactRegistry_remote() throws IOException {
-        try (ArtifactRegistryClient artifactRegistryClient = ArtifactRegistryClient.create()) {
-            RepositoryName parent = RepositoryName.of(projectId, location, remoteRepo);
+        if (Boolean.valueOf(System.getenv("TEST_REMOTE_REPO"))) {
+            try (ArtifactRegistryClient artifactRegistryClient = ArtifactRegistryClient.create()) {
+                RepositoryName parent = RepositoryName.of(projectId, location, remoteRepo);
 
-            ListPackagesPagedResponse response = artifactRegistryClient
-                    .listPackages(parent.toString());
-            assertThat(Iterables.size(response.iterateAll())).isAtLeast(1);
+                ListPackagesPagedResponse response = artifactRegistryClient
+                        .listPackages(parent.toString());
+                assertThat(Iterables.size(response.iterateAll())).isAtLeast(1);
+            }
         }
     }
 
     @Test
     public void verifyArtifactRegistry_maven() throws IOException {
         try (ArtifactRegistryClient artifactRegistryClient = ArtifactRegistryClient.create()) {
-            RepositoryName parent = RepositoryName.of(projectId, location, remoteRepo);
+            RepositoryName parent = RepositoryName.of(projectId, location, mavenRepo);
 
             ListPackagesPagedResponse response = artifactRegistryClient
                     .listPackages(parent.toString());
@@ -143,15 +154,15 @@ public class GuestbookIT {
                             && occ.getBuild().getProvenance() != null)
                     .collect(Collectors.toList());
 
-            List<Occurrence> mvnFiltered = StreamSupport
-                    .stream(occurences.iterateAll().spliterator(), false)
-                    .filter(occ -> occ.getResourceUri().contains(mavenArtifact)
-                            && occ.getBuild().getProvenance() != null)
-                    .collect(Collectors.toList());
+            // List<Occurrence> mvnFiltered = StreamSupport
+            // .stream(occurences.iterateAll().spliterator(), false)
+            // .filter(occ -> occ.getResourceUri().contains(mavenArtifact)
+            // && occ.getBuild().getProvenance() != null)
+            // .collect(Collectors.toList());
 
             assertThat(frontendFiltered).isNotEmpty();
             assertThat(backendFiltered).isNotEmpty();
-            assertThat(mvnFiltered).isNotEmpty();
+            // assertThat(mvnFiltered).isNotEmpty();
         }
     }
 }

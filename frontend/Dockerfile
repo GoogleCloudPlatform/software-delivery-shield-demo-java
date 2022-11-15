@@ -32,7 +32,7 @@ RUN mvn package -DskipTests
 FROM eclipse-temurin:17-jre
 
 # Copy the compiled files over.
-COPY --from=build-env /app/frontend/target /app/
+COPY --from=build-env /app/target /app/
 
 # Starts java app with debugging server at port 5005.
 ENTRYPOINT ["java", "-jar", "/app/backend-1.0.jar"]

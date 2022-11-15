@@ -17,18 +17,16 @@ steps:
     name: "gcr.io/cloud-builders/gcloud:latest"
     entrypoint: /bin/bash
     args:
-    - "-xe"
+    - "-x"
     - "-c"
     - |
       sed -i "s/\/PROJECT_ID/\/${PROJECT_ID}/g" **/*clouddeploy.yaml clouddeploy.yaml policy.yaml pom.xml
-      # sed -i "s/<\!-- <repositories>/<repositories>/g" pom.xml
-      # sed -i "s/<\/repositories> -->/<\/repositories>/g" pom.xml
 
   - id: "Clean up: Cloud Deploy"
     name: "gcr.io/cloud-builders/gcloud:latest"
     entrypoint: /bin/bash
     args:
-    - "-xe"
+    - "-x"
     - "-c"
     - |
       gcloud deploy delivery-pipelines delete guestbook-app-delivery --region us-central1 --force --quiet || echo "Cloud Deploy pipeline does not exist"
@@ -70,14 +68,6 @@ steps:
         --location=us-central1 \
         --description="My Maven repo" 
 
-      # gcloud artifacts repositories create guestbook-remote-repo \
-      #     --repository-format=maven \
-      #     --location=us-central1 \
-      #     --description="My remote repo" \
-      #     --mode=remote-repository \
-      #     --remote-repo-config-desc="Maven Central" \
-      #     --remote-mvn-repo=MAVEN-CENTRAL
-
       gcloud artifacts repositories create containers \
         --repository-format=docker \
         --location=us-central1 \
@@ -87,12 +77,11 @@ steps:
     name: "gcr.io/cloud-builders/gcloud:latest"
     entrypoint: /bin/bash
     args:
-    - "-xe"
     - "-c"
     - |
       gcloud builds submit --config cloudbuild.yaml \
         --region us-central1 \
-        --substitutions SHORT_SHA=$SHORT_SHA \
+        --substitutions SHORT_SHA=$SHORT_SHA
 
   - id: "Run Integration Tests"
     name: "gcr.io/cloud-builders/mvn:latest"
@@ -100,3 +89,4 @@ steps:
     env:
      - "PROJECT_ID=${PROJECT_ID}"
      - "SHORT_SHA=${SHORT_SHA}"
+     - "TEST_REMOTE_REMOTE=false"

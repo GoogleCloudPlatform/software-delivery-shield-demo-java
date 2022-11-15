@@ -7,11 +7,11 @@
   <name>Guestbook POJO</name>
   <version>1.0</version>
 
-  <parent>
+  <!-- <parent>
     <groupId>com.example.guestbook</groupId>
     <artifactId>java-guestbook</artifactId>
     <version>1.0</version>
-  </parent>
+  </parent> -->
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -40,6 +40,13 @@
   </dependencies>
 
   <build>
+    <extensions>
+      <extension>
+        <groupId>com.google.cloud.artifactregistry</groupId>
+        <artifactId>artifactregistry-maven-wagon</artifactId>
+        <version>2.2.0</version>
+      </extension>
+    </extensions>
     <plugins>
       <plugin>
         <groupId>com.google.cloud.tools</groupId>
