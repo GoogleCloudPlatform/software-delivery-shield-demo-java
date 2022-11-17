@@ -32,7 +32,7 @@
     terraform init
     ```
 
-1. Next, you can run a plan to get an idea of the changes that will be applied.
+1. Next, run a plan to get an idea of the changes that will be applied:
     ```
     terraform plan -var-file="deploy-to-gke.tfvars" -out plan.out
     ```
