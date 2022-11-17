@@ -14,7 +14,7 @@
 
 resource "google_clouddeploy_target" "dev" {
   location    = var.google_cloud_region
-  count       = var.use_cloud_run ? 0 : 1
+  count       = var.use_cloud_run ? 0 : 1 #Used to "enable" or "disable" a resource conditionally. This isn't actually used for increasing the quantity of the resource. See https://github.com/hashicorp/terraform/issues/21953 for context.
   name        = "dev-cluster"
   description = "dev cluster"
 
@@ -27,7 +27,7 @@ resource "google_clouddeploy_target" "dev" {
 
 resource "google_clouddeploy_target" "prod" {
   location    = var.google_cloud_region
-  count       = var.use_cloud_run ? 0 : 1
+  count       = var.use_cloud_run ? 0 : 1 #Used to "enable" or "disable" a resource conditionally. This isn't actually used for increasing the quantity of the resource. See https://github.com/hashicorp/terraform/issues/21953 for context.
   name        = "prod-cluster"
   description = "production cluster"
 
@@ -39,7 +39,7 @@ resource "google_clouddeploy_target" "prod" {
 
 resource "google_clouddeploy_delivery_pipeline" "primary" {
   location    = var.google_cloud_region
-  count       = var.use_cloud_run ? 0 : 1
+  count       = var.use_cloud_run ? 0 : 1 #Used to "enable" or "disable" a resource conditionally. This isn't actually used for increasing the quantity of the resource. See https://github.com/hashicorp/terraform/issues/21953 for context.
   name        = "guestbook-app-delivery"
   description = "main application pipeline"
 

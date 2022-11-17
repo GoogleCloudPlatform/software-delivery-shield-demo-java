@@ -32,12 +32,16 @@
 
 1. _cd_ into the `tf` folder` and run:
     ```
-    terraform plan -var-file="deploy-to-gke.tfvars"
+    terraform init
+    ```
+1. Next, you can run a plan to get an idea of the changes that will be applied.
+    ```
+    terraform plan -var-file="deploy-to-gke.tfvars" -out plan.out
     ```
 
 1. Terraform will then show you a listing of everything that will be deployed. If it all looks good, go ahead and run:
     ```
-    terraform apply -var-file="deploy-to-gke.tfvars"
+    terraform apply plan.out
     ```
 
 1. Replace PROJECT_ID placeholder with your Project Id:

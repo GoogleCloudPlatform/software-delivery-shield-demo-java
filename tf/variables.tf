@@ -40,7 +40,7 @@ variable "google_billing_account" {
   default     = null
 }
 
-variable "use_cloud_run" {
+variable "use_cloud_run" { #Used to "enable" or "disable" a resource conditionally.
   type    = bool
   default = false
 }

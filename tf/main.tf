@@ -30,7 +30,7 @@ resource "random_id" "suffix" {
 }
 
 resource "google_project" "generated_project" {
-  count           = var.existing_project_id == null ? 1 : 0
+  count           = var.existing_project_id == null ? 1 : 0 #Used to "enable" or "disable" a resource conditionally. This isn't actually used for increasing the quantity of the resource. See https://github.com/hashicorp/terraform/issues/21953 for context.
   project_id      = local.gen_project_id
   name            = local.gen_project_id
   billing_account = var.google_billing_account
@@ -76,7 +76,7 @@ resource "google_project_service" "sds_demo_services" {
 }
 
 resource "time_sleep" "wait_for_services" {
-  create_duration = "30s"
+  create_duration = "300s"
   depends_on = [google_project_service.sds_demo_services]
 }
 
@@ -93,7 +93,7 @@ resource "google_artifact_registry_repository" "guestbook_remote_repo" {
   description   = "SDS Java Demo remote repo"
   format        = "MAVEN"
   location      = var.google_cloud_region
-  repository_id = "guestbook-remote-repo"
+  repository_id = "guestbook-maven-repo"
 }
 
 # Set IAM policy
