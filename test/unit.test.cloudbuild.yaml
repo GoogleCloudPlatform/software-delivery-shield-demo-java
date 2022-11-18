@@ -37,7 +37,6 @@ steps:
   
   - id: "Run Unit Tests: Frontend"
     name: "gcr.io/cloud-builders/mvn"
-    dir: "guestbook-pojo"
     entrypoint: /bin/bash
     args:
     - "-xe"

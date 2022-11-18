@@ -59,9 +59,8 @@ public class GuestbookIT {
         projectId = System.getenv("PROJECT_ID");
         assertThat(projectId).isNotNull();
 
-        String shortSha = System.getenv("SHORT_SHA");
-        assertThat(shortSha).isNotNull();
-        release = "release-" + shortSha;
+        release = System.getenv().getOrDefault("RELEASE_NAME",
+                "release-" + System.getenv("SHORT_SHA"));
 
         remoteRepo = System.getenv().getOrDefault("REMOTE_REPO", "guestbook-remote-repo");
 

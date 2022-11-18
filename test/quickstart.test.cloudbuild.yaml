@@ -112,6 +112,7 @@ steps:
      - "TEST_REMOTE_REMOTE=false"
      - "CONTAINERS=${_REPOSITORY}"
      - "PIPELINE=${_GKE_PIPELINE}"
+     - "RELEASE_NAME=gke-${BUILD_ID}"
 
   - id: "Run Integration Tests: Cloud Run"
     name: "gcr.io/cloud-builders/mvn:latest"
@@ -123,6 +124,7 @@ steps:
      - "TEST_REMOTE_REMOTE=false"
      - "CONTAINERS=${_REPOSITORY}"
      - "PIPELINE=${_CLOUDRUN_PIPELINE}"
+     - "RELEASE_NAME=gke-${BUILD_ID}"
 
 substitutions:
   _REPOSITORY: qs-containers
