@@ -57,7 +57,6 @@
             --member=serviceAccount:$(gcloud projects describe $PROJECT_ID \
             --format="value(projectNumber)")@cloudbuild.gserviceaccount.com \
             --role="roles/container.admin"
-
         ```
 
     * Grant the Cloud Build and Google Cloud Deploy service account, default Compute Engine service account, privilege to deploy to GKE:
@@ -66,7 +65,7 @@
         gcloud projects add-iam-policy-binding $PROJECT_ID \
             --member=serviceAccount:$(gcloud projects describe $PROJECT_ID \
             --format="value(projectNumber)")-compute@developer.gserviceaccount.com \
-            --role="roles/run.developer"
+            --role="roles/artifactregistry.reader"
 
         gcloud projects add-iam-policy-binding $PROJECT_ID \
             --member=serviceAccount:$(gcloud projects describe $PROJECT_ID \

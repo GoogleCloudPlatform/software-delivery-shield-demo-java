@@ -23,9 +23,13 @@ import com.google.cloud.deploy.v1.Rollout;
 import com.google.cloud.devtools.containeranalysis.v1.ContainerAnalysisClient;
 import com.google.common.collect.Iterables;
 import com.google.devtools.artifactregistry.v1.ArtifactRegistryClient;
+import com.google.devtools.artifactregistry.v1.DockerImage;
+import com.google.devtools.artifactregistry.v1.DockerImageName;
 import com.google.devtools.artifactregistry.v1.ArtifactRegistryClient.ListDockerImagesPagedResponse;
 import com.google.devtools.artifactregistry.v1.ArtifactRegistryClient.ListPackagesPagedResponse;
 import com.google.devtools.artifactregistry.v1.RepositoryName;
+
+import io.grafeas.v1.BuildOccurrence;
 import io.grafeas.v1.GrafeasClient;
 import io.grafeas.v1.GrafeasClient.ListOccurrencesPagedResponse;
 import io.grafeas.v1.Occurrence;
@@ -48,6 +52,7 @@ public class GuestbookIT {
     final String frontendImage = "java-guestbook-frontend";
     final String backendImage = "java-guestbook-backend";
     final String mavenArtifact = "com.example.guestbook:java-guestbook-pojo";
+    List<DockerImage> dockerImages;
 
     @BeforeAll
     public static void init() {
@@ -73,7 +78,10 @@ public class GuestbookIT {
             RepositoryName parent = RepositoryName.of(projectId, location, containerRepo);
             ListDockerImagesPagedResponse response = artifactRegistryClient
                     .listDockerImages(parent.toString());
-            assertThat(Iterables.size(response.iterateAll())).isEqualTo(2);
+            dockerImages = StreamSupport
+                    .stream(response.getPage().iterateAll().spliterator(), false)
+                    .collect(Collectors.toList());
+            assertThat(dockerImages.size()).isEqualTo(2);
         }
     }
 
@@ -85,6 +93,8 @@ public class GuestbookIT {
 
                 ListPackagesPagedResponse response = artifactRegistryClient
                         .listPackages(parent.toString());
+
+                // Packages are found in remote repo
                 assertThat(Iterables.size(response.iterateAll())).isAtLeast(1);
             }
         }
@@ -92,13 +102,16 @@ public class GuestbookIT {
 
     @Test
     public void verifyArtifactRegistry_maven() throws IOException {
-        try (ArtifactRegistryClient artifactRegistryClient = ArtifactRegistryClient.create()) {
-            RepositoryName parent = RepositoryName.of(projectId, location, mavenRepo);
+        if (Boolean.valueOf(System.getenv("TEST_MAVEN_REPO"))) {
+            try (ArtifactRegistryClient artifactRegistryClient = ArtifactRegistryClient.create()) {
+                RepositoryName parent = RepositoryName.of(projectId, location, mavenRepo);
 
-            ListPackagesPagedResponse response = artifactRegistryClient
-                    .listPackages(parent.toString());
+                ListPackagesPagedResponse response = artifactRegistryClient
+                        .listPackages(parent.toString());
 
-            assertThat(Iterables.size(response.iterateAll())).isAtLeast(1);
+                // Package is found in maven repo
+                assertThat(Iterables.size(response.iterateAll())).isAtLeast(1);
+            }
         }
     }
 
@@ -135,34 +148,27 @@ public class GuestbookIT {
     }
 
     @Test
-    public void verifyContainerAnalysis() throws IOException {
+    public void verifyContainerAnalysis_provenance() throws IOException {
         try (ContainerAnalysisClient containerAnalysisClient = ContainerAnalysisClient.create()) {
             GrafeasClient grafeasClient = containerAnalysisClient.getGrafeasClient();
+            for (DockerImage dockerImage : dockerImages) {
+                ListOccurrencesPagedResponse occurences = grafeasClient.listOccurrences(
+                        ProjectName.of(projectId),
+                        String.format("resourceUrl=\"https://%s\" AND kind=\"BUILD\"",
+                                dockerImage.getUri()));
 
-            ListOccurrencesPagedResponse occurences = grafeasClient
-                    .listOccurrences(ProjectName.of(projectId), "");
+                List<Occurrence> occurrenceList = StreamSupport
+                        .stream(occurences.getPage().iterateAll().spliterator(), false)
+                        .collect(Collectors.toList());
+                assertThat(occurrenceList.size()).isAtLeast(2);
 
-            List<Occurrence> frontendFiltered = StreamSupport
-                    .stream(occurences.getPage().iterateAll().spliterator(), false)
-                    .filter(occ -> occ.getResourceUri().contains(frontendImage)
-                            && occ.getBuild().getProvenance() != null)
-                    .collect(Collectors.toList());
+                for (Occurrence imageOccurrence : occurrenceList) {
+                    BuildOccurrence build = imageOccurrence.getBuild();
+                    assertThat(
+                            build.getProvenance() != null || build.getIntotoProvenance() != null);
+                }
 
-            List<Occurrence> backendFiltered = StreamSupport
-                    .stream(occurences.iterateAll().spliterator(), false)
-                    .filter(occ -> occ.getResourceUri().contains(backendImage)
-                            && occ.getBuild().getProvenance() != null)
-                    .collect(Collectors.toList());
-
-            // List<Occurrence> mvnFiltered = StreamSupport
-            // .stream(occurences.iterateAll().spliterator(), false)
-            // .filter(occ -> occ.getResourceUri().contains(mavenArtifact)
-            // && occ.getBuild().getProvenance() != null)
-            // .collect(Collectors.toList());
-
-            assertThat(frontendFiltered).isNotEmpty();
-            assertThat(backendFiltered).isNotEmpty();
-            // assertThat(mvnFiltered).isNotEmpty();
+            }
         }
     }
 }

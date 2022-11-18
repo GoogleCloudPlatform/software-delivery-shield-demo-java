@@ -17,7 +17,6 @@
 # https://cloud.google.com/software-supply-chain-security/docs/sds/deploy-gke-view-security-insights
 # https://cloud.google.com/software-supply-chain-security/docs/sds/deploy-run-view-security-insights
 steps:
-
   - id: "Clean up: Artifact Registry"
     name: "gcr.io/cloud-builders/gcloud:latest"
     entrypoint: /bin/bash
@@ -60,8 +59,8 @@ steps:
     - "-c"
     - |
       sed -i "s/\/PROJECT_ID/\/${PROJECT_ID}/g" clouddeploy.yaml cloudrun.clouddeploy.yaml
-      sed -i "s/cloudrun-guestbook-backend-delivery/cloudrun-guestbook-backend-quickstart/g" cloudrun.clouddeploy.yaml
-      sed -i "s/guestbook-app-delivery/guestbook-app-quickstart/g" clouddeploy.yaml
+      sed -i "s/guestbook-app-delivery/${_GKE_PIPELINE}/g" clouddeploy.yaml
+      sed -i "s/cloudrun-guestbook-backend-delivery/${_CLOUDRUN_PIPELINE}/g" cloudrun.clouddeploy.yaml
 
   - id: "Clean up: Cloud Deploy"
     name: "gcr.io/cloud-builders/gcloud:latest"
@@ -70,8 +69,8 @@ steps:
     - "-x"
     - "-c"
     - |
-      gcloud deploy delivery-pipelines delete guestbook-app-quickstart --region us-central1 --force --quiet || echo "Cloud Deploy pipeline does not exist"
-      gcloud deploy delivery-pipelines delete cloudrun-guestbook-backend-quickstart --region us-central1 --force --quiet || echo "Cloud Deploy pipeline does not exist"
+      gcloud deploy delivery-pipelines delete ${_GKE_PIPELINE} --region us-central1 --force --quiet || echo "Cloud Deploy pipeline does not exist"
+      gcloud deploy delivery-pipelines delete ${_CLOUDRUN_PIPELINE} --region us-central1 --force --quiet || echo "Cloud Deploy pipeline does not exist"
 
   - id: "Set up: Cloud Deploy"
     name: "gcr.io/cloud-builders/gcloud:latest"
@@ -92,16 +91,40 @@ steps:
     - "-xe"
     - "-c"
     - |
+      gcloud deploy releases create gke-$BUILD_ID \
+        --delivery-pipeline=${_GKE_PIPELINE} \
+        --region us-central1 \
+        --images=java-guestbook-backend=us-central1-docker.pkg.dev/${PROJECT_ID}/${_REPOSITORY}/java-guestbook-backend:quickstart
+
       gcloud deploy releases create cr-$BUILD_ID \
-        --delivery-pipeline=cloudrun-guestbook-backend-quickstart \
+        --delivery-pipeline=${_CLOUDRUN_PIPELINE} \
         --region us-central1 \
         --skaffold-file=cloudrun.skaffold.yaml \
         --images=java-guestbook-backend=us-central1-docker.pkg.dev/${PROJECT_ID}/${_REPOSITORY}/java-guestbook-backend:quickstart
 
-      gcloud deploy releases create gke-$BUILD_ID \
-        --delivery-pipeline=guestbook-app-quickstart \
-        --region us-central1 \
-        --images=java-guestbook-backend=us-central1-docker.pkg.dev/${PROJECT_ID}/${_REPOSITORY}/java-guestbook-backend:quickstart
+  - id: "Run Integration Tests: GKE"
+    name: "gcr.io/cloud-builders/mvn:latest"
+    args: ["verify", "-Dtest=GuestbookIT", "-pl=backend"]
+    env:
+     - "PROJECT_ID=${PROJECT_ID}"
+     - "SHORT_SHA=${SHORT_SHA}"
+     - "TEST_MAVEN_REPO=false"
+     - "TEST_REMOTE_REMOTE=false"
+     - "CONTAINERS=${_REPOSITORY}"
+     - "PIPELINE=${_GKE_PIPELINE}"
+
+  - id: "Run Integration Tests: Cloud Run"
+    name: "gcr.io/cloud-builders/mvn:latest"
+    args: ["verify", "-Dtest=GuestbookIT", "-pl=backend"]
+    env:
+     - "PROJECT_ID=${PROJECT_ID}"
+     - "SHORT_SHA=${SHORT_SHA}"
+     - "TEST_MAVEN_REPO=false"
+     - "TEST_REMOTE_REMOTE=false"
+     - "CONTAINERS=${_REPOSITORY}"
+     - "PIPELINE=${_CLOUDRUN_PIPELINE}"
 
 substitutions:
   _REPOSITORY: qs-containers
+  _CLOUDRUN_PIPELINE: cloudrun-guestbook-backend-quickstart
+  _GKE_PIPELINE: guestbook-app-quickstart
