@@ -72,8 +72,7 @@ public class GuestbookIT {
         pipeline = System.getenv().getOrDefault("PIPELINE", "guestbook-app-delivery");
     }
 
-    @Test
-    public void verifyArtifactRegistry_containers() throws IOException {
+    public void getDockerImages() throws IOException {
         try (ArtifactRegistryClient artifactRegistryClient = ArtifactRegistryClient.create()) {
             RepositoryName parent = RepositoryName.of(projectId, location, containerRepo);
             ListDockerImagesPagedResponse response = artifactRegistryClient
@@ -81,8 +80,15 @@ public class GuestbookIT {
             dockerImages = StreamSupport
                     .stream(response.getPage().iterateAll().spliterator(), false)
                     .collect(Collectors.toList());
-            assertThat(dockerImages.size()).isEqualTo(2);
         }
+    }
+
+    @Test
+    public void verifyArtifactRegistry_containers() throws IOException {
+        if (dockerImages == null) {
+            getDockerImages();
+        }
+        assertThat(dockerImages.size()).isAtLeast(1);
     }
 
     @Test
@@ -149,6 +155,9 @@ public class GuestbookIT {
 
     @Test
     public void verifyContainerAnalysis_provenance() throws IOException {
+        if (dockerImages == null) {
+            getDockerImages();
+        }
         try (ContainerAnalysisClient containerAnalysisClient = ContainerAnalysisClient.create()) {
             GrafeasClient grafeasClient = containerAnalysisClient.getGrafeasClient();
             for (DockerImage dockerImage : dockerImages) {

@@ -26,7 +26,7 @@ steps:
     name: "gcr.io/cloud-builders/mvn:latest"
     args: ["checkstyle:check"]
 
-  - id: "Run Unit Tests"
+  - id: "Run Unit Tests: Backend"
     name: "gcr.io/cloud-builders/mvn:latest"
     entrypoint: /bin/bash
     args:
@@ -34,4 +34,14 @@ steps:
     - "-c"
     - |
       mvn verify -f backend/
-      mvn verify -f frontend/ # This step may fail without maven repo set up
+  
+  - id: "Run Unit Tests: Frontend"
+    name: "gcr.io/cloud-builders/mvn"
+    dir: "guestbook-pojo"
+    entrypoint: /bin/bash
+    args:
+    - "-xe"
+    - "-c"
+    - |
+      mvn deploy -f guestbook-pojo/ || echo "Artifact may already exist"
+      mvn verify -f frontend/
