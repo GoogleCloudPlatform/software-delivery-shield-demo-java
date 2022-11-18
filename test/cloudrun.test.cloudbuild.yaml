@@ -51,13 +51,10 @@ steps:
     - "-xe"
     - "-c"
     - |
-      gcloud artifacts repositories delete cloudrun-guestbook-remote-repo \
+      gcloud artifacts repositories delete ${_MAVEN_REPO} \
         --location us-central1 --quiet || echo "Artifact Registry repository does not exist"
       
-      gcloud artifacts repositories delete cloudrun-guestbook-maven-repo \
-        --location us-central1 --quiet || echo "Artifact Registry repository does not exist"
-      
-      gcloud artifacts repositories delete cloudrun-containers \
+      gcloud artifacts repositories delete ${_REPOSITORY} \
         --location us-central1 --quiet || echo "Artifact Registry repository does not exist"
 
   - id: "Set up: Artifact Registry"
@@ -67,12 +64,12 @@ steps:
     - "-xe"
     - "-c"
     - |
-      gcloud artifacts repositories create cloudrun-guestbook-maven-repo \
+      gcloud artifacts repositories create ${_MAVEN_REPO} \
         --repository-format=maven \
         --location=us-central1 \
         --description="My Maven repo" 
 
-      gcloud artifacts repositories create cloudrun-containers \
+      gcloud artifacts repositories create ${_REPOSITORY} \
         --repository-format=docker \
         --location=us-central1 \
         --description="Docker repository"
@@ -88,13 +85,28 @@ steps:
         --region us-central1 \
         --substitutions SHORT_SHA=$SHORT_SHA
 
-  - id: "Run Integration Tests"
+  - id: "Run Integration Tests: Frontend"
     name: "gcr.io/cloud-builders/mvn:latest"
     args: ["verify", "-Dtest=GuestbookIT", "-pl=backend"]
     env:
      - "PROJECT_ID=${PROJECT_ID}"
      - "SHORT_SHA=${SHORT_SHA}"
+     - "TEST_REMOTE_REMOTE=false"
+     - "PIPELINE=cloudrun-guestbook-frontend-delivery"
+     - "MAVEN_REPO=${_MAVEN_REPO}"
+     - "CONTAINERS=${_REPOSITORY}"
+
+  - id: "Run Integration Tests: Backend"
+    name: "gcr.io/cloud-builders/mvn:latest"
+    args: ["verify", "-Dtest=GuestbookIT", "-pl=backend"]
+    env:
+     - "PROJECT_ID=${PROJECT_ID}"
+     - "SHORT_SHA=${SHORT_SHA}"
+     - "TEST_REMOTE_REMOTE=false"
+     - "TEST_MAVEN_REPO=false"
      - "PIPELINE=cloudrun-guestbook-backend-delivery"
-     - "REMOTE_REPO=cloudrun-guestbook-remote-repo"
-     - "MAVEN_REPO=cloudrun-guestbook-maven-repo"
-     - "CONTAINERS=cloudrun-containers"
+     - "CONTAINERS=${_REPOSITORY}"
+
+substitutions:
+  _REPOSITORY: cloudrun-containers
+  _MAVEN_REPO: cloudrun-guestbook-maven-repo

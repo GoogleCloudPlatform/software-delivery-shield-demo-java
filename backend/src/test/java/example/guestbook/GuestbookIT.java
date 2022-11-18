@@ -24,7 +24,6 @@ import com.google.cloud.devtools.containeranalysis.v1.ContainerAnalysisClient;
 import com.google.common.collect.Iterables;
 import com.google.devtools.artifactregistry.v1.ArtifactRegistryClient;
 import com.google.devtools.artifactregistry.v1.DockerImage;
-import com.google.devtools.artifactregistry.v1.DockerImageName;
 import com.google.devtools.artifactregistry.v1.ArtifactRegistryClient.ListDockerImagesPagedResponse;
 import com.google.devtools.artifactregistry.v1.ArtifactRegistryClient.ListPackagesPagedResponse;
 import com.google.devtools.artifactregistry.v1.RepositoryName;
