@@ -83,7 +83,9 @@ steps:
     - |
       gcloud builds submit --config cloudrun.cloudbuild.yaml \
         --region us-central1 \
-        --substitutions SHORT_SHA=$SHORT_SHA
+        --substitutions SHORT_SHA=$SHORT_SHA \
+        --substitutions _BACKEND_IMAGE=us-central1-docker.pkg.dev/${PROJECT_ID}/${_REPOSITORY}/java-guestbook-backend \
+        --substitutions _FRONTEND_IMAGE=us-central1-docker.pkg.dev/${PROJECT_ID}/${_REPOSITORY}/java-guestbook-frontend
 
   - id: "Run Integration Tests: Frontend"
     name: "gcr.io/cloud-builders/mvn:latest"
@@ -95,6 +97,7 @@ steps:
      - "PIPELINE=cloudrun-guestbook-frontend-delivery"
      - "MAVEN_REPO=${_MAVEN_REPO}"
      - "CONTAINERS=${_REPOSITORY}"
+     - "RELEASE_NAME=frontend-release-${SHORT_SHA}"
 
   - id: "Run Integration Tests: Backend"
     name: "gcr.io/cloud-builders/mvn:latest"
@@ -106,6 +109,7 @@ steps:
      - "TEST_MAVEN_REPO=false"
      - "PIPELINE=cloudrun-guestbook-backend-delivery"
      - "CONTAINERS=${_REPOSITORY}"
+     - "RELEASE_NAME=backend-release-${SHORT_SHA}"
 
 substitutions:
   _REPOSITORY: cloudrun-containers
