@@ -78,7 +78,6 @@ steps:
     name: "gcr.io/cloud-builders/gcloud:latest"
     entrypoint: /bin/bash
     args:
-    - "-xe"
     - "-c"
     - |
       gcloud builds submit --config cloudrun.cloudbuild.yaml \
@@ -92,7 +91,6 @@ steps:
     args: ["verify", "-Dtest=GuestbookIT", "-pl=backend"]
     env:
      - "PROJECT_ID=${PROJECT_ID}"
-     - "SHORT_SHA=${SHORT_SHA}"
      - "TEST_REMOTE_REMOTE=false"
      - "PIPELINE=cloudrun-guestbook-frontend-delivery"
      - "MAVEN_REPO=${_MAVEN_REPO}"
@@ -104,7 +102,6 @@ steps:
     args: ["verify", "-Dtest=GuestbookIT", "-pl=backend"]
     env:
      - "PROJECT_ID=${PROJECT_ID}"
-     - "SHORT_SHA=${SHORT_SHA}"
      - "TEST_REMOTE_REMOTE=false"
      - "TEST_MAVEN_REPO=false"
      - "PIPELINE=cloudrun-guestbook-backend-delivery"
