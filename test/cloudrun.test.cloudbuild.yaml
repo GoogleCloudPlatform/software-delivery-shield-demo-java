@@ -82,9 +82,7 @@ steps:
     - |
       gcloud builds submit --config cloudrun.cloudbuild.yaml \
         --region us-central1 \
-        --substitutions SHORT_SHA=$SHORT_SHA \
-        --substitutions _BACKEND_IMAGE=us-central1-docker.pkg.dev/${PROJECT_ID}/${_REPOSITORY}/java-guestbook-backend \
-        --substitutions _FRONTEND_IMAGE=us-central1-docker.pkg.dev/${PROJECT_ID}/${_REPOSITORY}/java-guestbook-frontend
+        --substitutions SHORT_SHA=$SHORT_SHA,_BACKEND_IMAGE=us-central1-docker.pkg.dev/${PROJECT_ID}/${_REPOSITORY}/java-guestbook-backend,_FRONTEND_IMAGE=us-central1-docker.pkg.dev/${PROJECT_ID}/${_REPOSITORY}/java-guestbook-frontend
 
   - id: "Run Integration Tests: Frontend"
     name: "gcr.io/cloud-builders/mvn:latest"
