@@ -7,13 +7,43 @@ updates:
     rebase-strategy: "disabled"
     schedule:
       interval: "monthly"
+
+  - package-ecosystem: "maven"
+    directory: "/guestbook-pojo"
+    commit-message:
+      prefix: "chore(deps): "
+    rebase-strategy: "disabled"
+    schedule:
+      interval: "monthly"
+
+  - package-ecosystem: "maven"
+    directory: "/frontend"
+    commit-message:
+      prefix: "chore(deps): "
+    rebase-strategy: "disabled"
+    schedule:
+      interval: "monthly"
+
+  - package-ecosystem: "maven"
+    directory: "/backend"
+    commit-message:
+      prefix: "chore(deps): "
+    rebase-strategy: "disabled"
+    schedule:
+      interval: "monthly"
     ignore:
-      - dependency-name: "*"
-        update-types: ["version-update:semver-patch"] # Security updates are unaffected by this setting
       - dependency-name: "com.google.code.gson:gson" # Dependency is used to illustrate a vulnerability
 
   - package-ecosystem: "docker"
-    directory: "/"
+    directory: "/backend"
+    commit-message:
+      prefix: "chore(deps): "
+    rebase-strategy: "disabled"
+    schedule:
+      interval: "monthly"
+
+  - package-ecosystem: "docker"
+    directory: "/frontend"
     commit-message:
       prefix: "chore(deps): "
     rebase-strategy: "disabled"
