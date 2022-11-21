@@ -120,6 +120,20 @@
             --member serviceAccount:frontend-prod-identity@$PROJECT_ID.iam.gserviceaccount.com \
             --role roles/run.invoker
         ```
+    
+    1. To deploy a Cloud Run service using a user-managed service account, you must have permission to impersonate that service account:
+
+        ```sh
+        gcloud iam service-accounts add-iam-policy-binding frontend-dev-identity@$PROJECT_ID.iam.gserviceaccount.com \
+            --member=serviceAccount:$(gcloud projects describe $PROJECT_ID \
+            --format="value(projectNumber)")-compute@developer.gserviceaccount.com \
+            --role="roles/iam.serviceAccountUser"
+
+        gcloud iam service-accounts add-iam-policy-binding frontend-prod-identity@$PROJECT_ID.iam.gserviceaccount.com \
+            --member=serviceAccount:$(gcloud projects describe $PROJECT_ID \
+            --format="value(projectNumber)")-compute@developer.gserviceaccount.com \
+            --role="roles/iam.serviceAccountUser"
+        ```
 
     1. Deploy placeholder services for the public frontend:
 
