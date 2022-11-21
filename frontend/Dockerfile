@@ -13,6 +13,7 @@
 # limitations under the License.
 
 # Use maven to compile the java application.
+# https://hub.docker.com/_/maven
 FROM maven:3-eclipse-temurin-17-alpine AS build-env
 
 # Set the working directory to /app
@@ -25,7 +26,7 @@ COPY pom.xml ./
 COPY . ./
 
 # Compile the application.
-RUN mvn -Dmaven.test.skip=true package
+RUN mvn package -DskipTests
 
 # Build runtime image.
 FROM eclipse-temurin:17-jre
