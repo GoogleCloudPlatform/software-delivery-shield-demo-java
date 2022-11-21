@@ -18,21 +18,19 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import com.google.gson.Gson;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.web.servlet.MockMvc;
-import com.google.gson.Gson;
 
 @WebMvcTest(controllers = BackendController.class)
 public class BackendControllerTest {
 
-  @MockBean
-  private MessageRepository mockRepository;
+  @MockBean private MessageRepository mockRepository;
 
-  @Autowired
-  private MockMvc mockMvc;
+  @Autowired private MockMvc mockMvc;
 
   @Test
   public void failsPostMessages() throws Exception {
@@ -45,9 +43,8 @@ public class BackendControllerTest {
     entry.setAuthor("author");
     entry.setMessage("message");
     Gson gson = new Gson();
-    this.mockMvc.perform(post("/messages")
-        .content(gson.toJson(entry))
-        .contentType("application/json"))
+    this.mockMvc
+        .perform(post("/messages").content(gson.toJson(entry)).contentType("application/json"))
         .andExpect(status().isOk());
   }
 
