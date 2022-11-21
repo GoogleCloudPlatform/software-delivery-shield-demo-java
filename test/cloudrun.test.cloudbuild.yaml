@@ -1,0 +1,111 @@
+# Copyright 2022 Google LLC
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+steps:
+  - id: "Set up: Project files"
+    name: "gcr.io/cloud-builders/gcloud:latest"
+    entrypoint: /bin/bash
+    args:
+    - "-xe"
+    - "-c"
+    - |
+      sed -i "s/\/PROJECT_ID/\/\/${PROJECT_ID}\//g" **/*clouddeploy.yaml clouddeploy.yaml policy.yaml pom.xml
+      sed -i "s/guestbook-maven-repo/cloudrun-guestbook-maven-repo/g" **/pom.xml
+      sed -i "s/guestbook-remote-repo/cloudrun-guestbook-remote-repo/g" pom.xml
+
+  - id: "Clean up: Cloud Deploy"
+    name: "gcr.io/cloud-builders/gcloud:latest"
+    entrypoint: /bin/bash
+    args:
+    - "-xe"
+    - "-c"
+    - |
+      gcloud deploy delivery-pipelines delete cloudrun-guestbook-backend-delivery --region us-central1 --force --quiet || echo "Cloud Deploy pipeline does not exist"
+      gcloud deploy delivery-pipelines delete cloudrun-guestbook-frontend-delivery --region us-central1 --force --quiet || echo "Cloud Deploy pipeline does not exist"
+
+  - id: "Set up: Cloud Deploy"
+    name: "gcr.io/cloud-builders/gcloud:latest"
+    entrypoint: /bin/bash
+    args:
+    - "-xe"
+    - "-c"
+    - |
+      gcloud deploy apply --region us-central1 --file backend/cloudrun.clouddeploy.yaml
+      gcloud deploy apply --region us-central1 --file frontend/cloudrun.clouddeploy.yaml
+
+  - id: "Clean up: Artifact Registry"
+    name: "gcr.io/cloud-builders/gcloud:latest"
+    entrypoint: /bin/bash
+    args:
+    - "-xe"
+    - "-c"
+    - |
+      gcloud artifacts repositories delete ${_MAVEN_REPO} \
+        --location us-central1 --quiet || echo "Artifact Registry repository does not exist"
+      
+      gcloud artifacts repositories delete ${_REPOSITORY} \
+        --location us-central1 --quiet || echo "Artifact Registry repository does not exist"
+
+  - id: "Set up: Artifact Registry"
+    name: "gcr.io/cloud-builders/gcloud:latest"
+    entrypoint: /bin/bash
+    args:
+    - "-xe"
+    - "-c"
+    - |
+      gcloud artifacts repositories create ${_MAVEN_REPO} \
+        --repository-format=maven \
+        --location=us-central1 \
+        --description="My Maven repo" 
+
+      gcloud artifacts repositories create ${_REPOSITORY} \
+        --repository-format=docker \
+        --location=us-central1 \
+        --description="Docker repository"
+
+  - id: "Run Demo Cloud Build"
+    name: "gcr.io/cloud-builders/gcloud:latest"
+    entrypoint: /bin/bash
+    args:
+    - "-c"
+    - |
+      gcloud builds submit --config cloudrun.cloudbuild.yaml \
+        --region us-central1 \
+        --substitutions SHORT_SHA=$SHORT_SHA,_BACKEND_IMAGE=us-central1-docker.pkg.dev/${PROJECT_ID}/${_REPOSITORY}/java-guestbook-backend,_FRONTEND_IMAGE=us-central1-docker.pkg.dev/${PROJECT_ID}/${_REPOSITORY}/java-guestbook-frontend
+
+  - id: "Run Integration Tests: Frontend"
+    name: "gcr.io/cloud-builders/mvn:latest"
+    args: ["verify", "-Dtest=GuestbookIT", "-pl=backend"]
+    env:
+     - "PROJECT_ID=${PROJECT_ID}"
+     - "TEST_REMOTE_REMOTE=false"
+     - "PIPELINE=cloudrun-guestbook-frontend-delivery"
+     - "MAVEN_REPO=${_MAVEN_REPO}"
+     - "CONTAINERS=${_REPOSITORY}"
+     - "RELEASE_NAME=frontend-release-${SHORT_SHA}"
+
+  - id: "Run Integration Tests: Backend"
+    name: "gcr.io/cloud-builders/mvn:latest"
+    args: ["verify", "-Dtest=GuestbookIT", "-pl=backend"]
+    env:
+     - "PROJECT_ID=${PROJECT_ID}"
+     - "TEST_REMOTE_REMOTE=false"
+     - "TEST_MAVEN_REPO=false"
+     - "PIPELINE=cloudrun-guestbook-backend-delivery"
+     - "CONTAINERS=${_REPOSITORY}"
+     - "RELEASE_NAME=backend-release-${SHORT_SHA}"
+
+substitutions:
+  _REPOSITORY: cloudrun-containers
+  _MAVEN_REPO: cloudrun-guestbook-maven-repo
