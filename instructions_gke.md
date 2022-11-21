@@ -2,6 +2,68 @@
 
 ### Before you begin
 
+1. Download **Cloud Code source protect (Preview)**
+
+   [Cloud Code](https://cloud.google.com/code/docs) source protect is not available
+   for public access. To get access to this feature, see the
+   [access request page][access].
+
+1. You have two options to get things ready:
+
+
+    - [Use Terraform to get things setup automatically](#Use-Terraform-to-get-things-setup-automatically)
+
+    __or__
+
+    - [Setup the environment manually](#setup-environment-manually)
+
+
+
+
+### Use Terraform to get things setup automatically
+
+1. Setup account info
+
+    -  __(If you don't have an existing project you want to deploy this demo into, skip to the next step)__ If you have an __existing__ project that you want to deploy this demo into, provide it in `deploy-to-gke.tfvars` by un-commenting `existing_project_id`, and replace "sds-java-demo" with the project ID you would like to use.
+
+    __or__
+
+    -  If you want Terraform to __create__ a project for you within your organization's billing account, provide it in `deploy-to-gke.tfvars` by un-commenting `google_billing_account`, and replace "00000-000000-0000" with the billing account number
+
+1. _cd_ into the `tf` folder` and run:
+    ```
+    terraform init
+    ```
+1. Next, run a plan to get an idea of the changes that will be applied:
+    ```
+    terraform plan -var-file="deploy-to-gke.tfvars" -out plan.out
+    ```
+
+1. Terraform will then show you a listing of everything that will be deployed. If it all looks good, go ahead and run:
+    ```
+    terraform apply plan.out
+    ```
+
+1. Replace PROJECT_ID placeholder with your Project Id:
+    * MacOS
+        ```sh
+        sed -i '.bak' "s/PROJECT_ID/$PROJECT_ID/g" **/*clouddeploy.yaml policy.yaml pom.xml
+        ```
+    * Linux
+        ```sh
+        sed -i "s/PROJECT_ID/$PROJECT_ID/g" **/*clouddeploy.yaml policy.yaml pom.xml
+        ```
+
+1. Set a **[Binary Authorization](https://cloud.google.com/binary-authorization/docs/deploy-cloud-build)** policy:
+
+    **⚠️ Note:** For your project to have the built by Cloud Build attestor, you need to run a build first. The easiest way to achieve this is deploying the backend to Cloud Run via source deploy: `cd backend; gcloud run deploy`
+
+    ```sh
+    gcloud container binauthz policy import policy.yaml
+    ```
+1. You're ready for the [Demo](#demo)!
+### Setup environment manually
+
 1. Set config for `gcloud`:
     ```sh
     export PROJECT_ID=<YOUR_PROJECT_ID>
@@ -26,12 +88,6 @@
         containerscanning.googleapis.com \
         containersecurity.googleapis.com
     ```
-
-1. Download **Cloud Code source protect (Preview)**
-
-   [Cloud Code](https://cloud.google.com/code/docs) source protect is not available
-   for public access. To get access to this feature, see the
-   [access request page][access].
 
 1. Make sure the default Compute Engine service account and Cloud Build service account have sufficient permissions.
 
@@ -93,8 +149,6 @@
         sed -i "s/PROJECT_ID/$PROJECT_ID/g" **/*clouddeploy.yaml clouddeploy.yaml policy.yaml pom.xml
         ```
 
-### Setup
-
 1. Set a **[Binary Authorization](https://cloud.google.com/binary-authorization/docs/deploy-cloud-build)** policy:
 
     **⚠️ Note:** For your project to have the built by Cloud Build attestor, you need to run a build first. The easiest way to achieve this is deploying the backend to Cloud Run via source deploy: `cd backend; gcloud run deploy`
@@ -155,8 +209,9 @@
     gcloud deploy apply --file clouddeploy.yaml
     ```
    **⚠️ Note:** Ensure clouddeploy.yaml has the correct values. “PROJECT_ID” should have been already replaced with your Project Id
+1. You're ready for the [Demo](#demo)!
 
-### Demo
+## Demo
 
 1. Use the **Cloud Code source protect** ([request access][access]) plugin to view dependencies vulnerabilities:
 
@@ -171,8 +226,8 @@
     The build does the following:
 
     * Caches dependency artifacts into an **Artifact Registry remote repo** ([request access][access]). The first time that you request a version of a package, Artifact Registry downloads and caches the package in the remote repository. The next time you request the same package version, Artifact Registry serves the cached copy.
-    * Builds and stores a Java dependency artifacts to Artifact Registry 
-    * Builds and push containers to Artifact Registry, where **[Container Analysis](https://cloud.google.com/container-analysis/docs/container-analysis)** provides integrated on-demand or automated scanning for base container images, Maven & Go packages in containers, and for non-containerized Maven packages.
+    * Builds and stores Java dependency artifacts to Artifact Registry 
+    * Builds and pushes containers to Artifact Registry, where **[Container Analysis](https://cloud.google.com/container-analysis/docs/container-analysis)** provides integrated on-demand or automated scanning for base container images, Maven & Go packages in containers, and for non-containerized Maven packages.
     * Automatically signs the artifacts with the attestor: [“built-with-cloud-build”](https://cloud.google.com/binary-authorization/docs/deploy-cloud-build)
     * Creates a release via Cloud Deploy
 
