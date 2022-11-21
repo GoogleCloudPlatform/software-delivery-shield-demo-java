@@ -23,11 +23,7 @@ steps:
     - "-xe"
     - "-c"
     - |
-      sed -i "s/PROJECT_ID/${PROJECT_ID}/g" **/pom.xml
-
-  - id: "Cache Maven Dependencies in an Artifact Registry Remote Repo"
-    name: gcr.io/cloud-builders/mvn
-    args: ["compile"]
+      sed -i "s/\/PROJECT_ID/\/\/${PROJECT_ID}\//g" pom.xml **/pom.xml
 
   - id: "Build Maven Artifact"
     name: "gcr.io/cloud-builders/mvn"
@@ -39,10 +35,14 @@ steps:
     - |
       mvn deploy || echo "Artifact may already exist"
 
+  - id: "Cache Maven Dependencies in an Artifact Registry Remote Repo"
+    name: gcr.io/cloud-builders/mvn
+    args: ["compile"]
+
   - id: "Build and Push Container Image: Frontend"
     name: "gcr.io/cloud-builders/docker"
     entrypoint: "/bin/bash"
-    dir: "frontend"
+    dir: frontend
     args:
       - "-c"
       - |
@@ -52,11 +52,11 @@ steps:
   - id: "Build and Push Container Image: Backend"
     name: "gcr.io/cloud-builders/docker"
     entrypoint: "/bin/bash"
-    dir: "backend"
+    dir: backend
     args:
       - "-c"
       - |
-        docker build --network=cloudbuild -t $_BACKEND_IMAGE:$SHORT_SHA .
+        docker build -t $_BACKEND_IMAGE:$SHORT_SHA .
         docker push $_BACKEND_IMAGE:$SHORT_SHA
 
   - id: "Create Cloud Deploy Release"
