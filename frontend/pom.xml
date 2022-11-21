@@ -8,12 +8,6 @@
   <name>Guestbook Frontend</name>
   <version>1.0</version>
 
-  <!-- <parent>
-    <groupId>com.example.guestbook</groupId>
-    <artifactId>java-guestbook</artifactId>
-    <version>1.0</version>
-  </parent> -->
-
   <properties>
     <maven.compiler.source>11</maven.compiler.source>
     <maven.compiler.target>11</maven.compiler.target>

@@ -7,12 +7,6 @@
   <name>Guestbook POJO</name>
   <version>1.0</version>
 
-  <!-- <parent>
-    <groupId>com.example.guestbook</groupId>
-    <artifactId>java-guestbook</artifactId>
-    <version>1.0</version>
-  </parent> -->
-
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <maven.compiler.source>11</maven.compiler.source>

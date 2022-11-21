@@ -25,6 +25,7 @@ public class GuestBookEntry {
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)
   private Long id;
+
   private String author;
   private String message;
   private long date;
