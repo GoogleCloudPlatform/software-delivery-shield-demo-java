@@ -21,110 +21,110 @@ steps:
     name: "gcr.io/cloud-builders/gcloud:latest"
     entrypoint: /bin/bash
     args:
-    - "-x"
-    - "-c"
-    - |
-      gcloud artifacts repositories delete $_REPOSITORY \
-        --location us-central1 --quiet || echo "Artifact Registry repository does not exist"
+      - "-x"
+      - "-c"
+      - |
+        gcloud artifacts repositories delete $_REPOSITORY \
+          --location us-central1 --quiet || echo "Artifact Registry repository does not exist"
 
   - id: "Set up: Artifact Registry"
     name: "gcr.io/cloud-builders/gcloud:latest"
     entrypoint: /bin/bash
     args:
-    - "-xe"
-    - "-c"
-    - |
-      gcloud artifacts repositories create $_REPOSITORY \
-        --repository-format=docker \
-        --location=us-central1 \
-        --description="Docker repository"
-      
+      - "-xe"
+      - "-c"
+      - |
+        gcloud artifacts repositories create $_REPOSITORY \
+          --repository-format=docker \
+          --location=us-central1 \
+          --description="Docker repository"
+
   - id: "Run Demo Cloud Build"
     name: "gcr.io/cloud-builders/gcloud:latest"
     dir: backend
     entrypoint: /bin/bash
     args:
-    - "-c"
-    - |
-      gcloud builds submit --config cloudbuild.yaml \
-        --region us-central1 \
-        --substitutions _BACKEND_IMAGE=us-central1-docker.pkg.dev/${PROJECT_ID}/$_REPOSITORY/java-guestbook-backend:quickstart
+      - "-c"
+      - |
+        gcloud builds submit --config cloudbuild.yaml \
+          --region us-central1 \
+          --substitutions _BACKEND_IMAGE=us-central1-docker.pkg.dev/${PROJECT_ID}/$_REPOSITORY/java-guestbook-backend:quickstart
 
   - id: "Set up: Project files"
     name: "gcr.io/cloud-builders/gcloud:latest"
     entrypoint: /bin/bash
     dir: backend
     args:
-    - "-x"
-    - "-c"
-    - |
-      sed -i "s/\/PROJECT_ID/\/\/${PROJECT_ID}\//g" clouddeploy.yaml cloudrun.clouddeploy.yaml
-      sed -i "s/guestbook-app-delivery/${_GKE_PIPELINE}/g" clouddeploy.yaml
-      sed -i "s/cloudrun-guestbook-backend-delivery/${_CLOUDRUN_PIPELINE}/g" cloudrun.clouddeploy.yaml
+      - "-x"
+      - "-c"
+      - |
+        sed -i "s/\/PROJECT_ID/\/\/${PROJECT_ID}\//g" clouddeploy.yaml cloudrun.clouddeploy.yaml
+        sed -i "s/guestbook-app-delivery/${_GKE_PIPELINE}/g" clouddeploy.yaml
+        sed -i "s/cloudrun-guestbook-backend-delivery/${_CLOUDRUN_PIPELINE}/g" cloudrun.clouddeploy.yaml
 
   - id: "Clean up: Cloud Deploy"
     name: "gcr.io/cloud-builders/gcloud:latest"
     entrypoint: /bin/bash
     args:
-    - "-x"
-    - "-c"
-    - |
-      gcloud deploy delivery-pipelines delete ${_GKE_PIPELINE} --region us-central1 --force --quiet || echo "Cloud Deploy pipeline does not exist"
-      gcloud deploy delivery-pipelines delete ${_CLOUDRUN_PIPELINE} --region us-central1 --force --quiet || echo "Cloud Deploy pipeline does not exist"
+      - "-x"
+      - "-c"
+      - |
+        gcloud deploy delivery-pipelines delete ${_GKE_PIPELINE} --region us-central1 --force --quiet || echo "Cloud Deploy pipeline does not exist"
+        gcloud deploy delivery-pipelines delete ${_CLOUDRUN_PIPELINE} --region us-central1 --force --quiet || echo "Cloud Deploy pipeline does not exist"
 
   - id: "Set up: Cloud Deploy"
     name: "gcr.io/cloud-builders/gcloud:latest"
     entrypoint: /bin/bash
     dir: backend
     args:
-    - "-xe"
-    - "-c"
-    - |
-      gcloud deploy apply --region us-central1 --file clouddeploy.yaml
-      gcloud deploy apply --region us-central1 --file cloudrun.clouddeploy.yaml
+      - "-xe"
+      - "-c"
+      - |
+        gcloud deploy apply --region us-central1 --file clouddeploy.yaml
+        gcloud deploy apply --region us-central1 --file cloudrun.clouddeploy.yaml
 
   - id: "Create Cloud Deploy releases"
     name: "gcr.io/cloud-builders/gcloud:latest"
     entrypoint: /bin/bash
     dir: backend
     args:
-    - "-xe"
-    - "-c"
-    - |
-      gcloud deploy releases create gke-$BUILD_ID \
-        --delivery-pipeline=${_GKE_PIPELINE} \
-        --region us-central1 \
-        --images=java-guestbook-backend=us-central1-docker.pkg.dev/${PROJECT_ID}/${_REPOSITORY}/java-guestbook-backend:quickstart
+      - "-xe"
+      - "-c"
+      - |
+        gcloud deploy releases create gke-$BUILD_ID \
+          --delivery-pipeline=${_GKE_PIPELINE} \
+          --region us-central1 \
+          --images=java-guestbook-backend=us-central1-docker.pkg.dev/${PROJECT_ID}/${_REPOSITORY}/java-guestbook-backend:quickstart
 
-      gcloud deploy releases create cr-$BUILD_ID \
-        --delivery-pipeline=${_CLOUDRUN_PIPELINE} \
-        --region us-central1 \
-        --skaffold-file=cloudrun.skaffold.yaml \
-        --images=java-guestbook-backend=us-central1-docker.pkg.dev/${PROJECT_ID}/${_REPOSITORY}/java-guestbook-backend:quickstart
+        gcloud deploy releases create cr-$BUILD_ID \
+          --delivery-pipeline=${_CLOUDRUN_PIPELINE} \
+          --region us-central1 \
+          --skaffold-file=cloudrun.skaffold.yaml \
+          --images=java-guestbook-backend=us-central1-docker.pkg.dev/${PROJECT_ID}/${_REPOSITORY}/java-guestbook-backend:quickstart
 
   - id: "Run Integration Tests: GKE"
     name: "gcr.io/cloud-builders/mvn:latest"
     args: ["verify", "-Dtest=GuestbookIT", "-pl=backend"]
     env:
-     - "PROJECT_ID=${PROJECT_ID}"
-     - "SHORT_SHA=${SHORT_SHA}"
-     - "TEST_MAVEN_REPO=false"
-     - "TEST_REMOTE_REMOTE=false"
-     - "CONTAINERS=${_REPOSITORY}"
-     - "PIPELINE=${_GKE_PIPELINE}"
-     - "RELEASE_NAME=gke-${BUILD_ID}"
+      - "PROJECT_ID=${PROJECT_ID}"
+      - "SHORT_SHA=${SHORT_SHA}"
+      - "TEST_MAVEN_REPO=false"
+      - "TEST_REMOTE_REMOTE=false"
+      - "CONTAINERS=${_REPOSITORY}"
+      - "PIPELINE=${_GKE_PIPELINE}"
+      - "RELEASE_NAME=gke-${BUILD_ID}"
 
   - id: "Run Integration Tests: Cloud Run"
     name: "gcr.io/cloud-builders/mvn:latest"
     args: ["verify", "-Dtest=GuestbookIT", "-pl=backend"]
     env:
-     - "PROJECT_ID=${PROJECT_ID}"
-     - "SHORT_SHA=${SHORT_SHA}"
-     - "TEST_MAVEN_REPO=false"
-     - "TEST_REMOTE_REMOTE=false"
-     - "CONTAINERS=${_REPOSITORY}"
-     - "PIPELINE=${_CLOUDRUN_PIPELINE}"
-     - "RELEASE_NAME=cr-${BUILD_ID}"
+      - "PROJECT_ID=${PROJECT_ID}"
+      - "SHORT_SHA=${SHORT_SHA}"
+      - "TEST_MAVEN_REPO=false"
+      - "TEST_REMOTE_REMOTE=false"
+      - "CONTAINERS=${_REPOSITORY}"
+      - "PIPELINE=${_CLOUDRUN_PIPELINE}"
+      - "RELEASE_NAME=cr-${BUILD_ID}"
 
 substitutions:
   _REPOSITORY: qs-containers

@@ -17,76 +17,86 @@ steps:
     name: "gcr.io/cloud-builders/gcloud:latest"
     entrypoint: /bin/bash
     args:
-    - "-x"
-    - "-c"
-    - |
-      sed -i "s/\/PROJECT_ID/\/\/${PROJECT_ID}\//g" **/*clouddeploy.yaml clouddeploy.yaml policy.yaml pom.xml
+      - "-x"
+      - "-c"
+      - |
+        sed -i "s/\/PROJECT_ID/\/\/${PROJECT_ID}\//g" **/*clouddeploy.yaml clouddeploy.yaml policy.yaml pom.xml
+        # Allow use of remote Maven repository
+        sed -i "s/<\!-- <repositories>/<repositories>/g" pom.xml
+        sed -i "s/<\/repositories> -->/<\/repositories>/g" pom.xml
 
   - id: "Clean up: Cloud Deploy"
     name: "gcr.io/cloud-builders/gcloud:latest"
     entrypoint: /bin/bash
     args:
-    - "-x"
-    - "-c"
-    - |
-      gcloud deploy delivery-pipelines delete guestbook-app-delivery --region us-central1 --force --quiet || echo "Cloud Deploy pipeline does not exist"
+      - "-x"
+      - "-c"
+      - |
+        gcloud deploy delivery-pipelines delete guestbook-app-delivery --region us-central1 --force --quiet || echo "Cloud Deploy pipeline does not exist"
 
   - id: "Set up: Cloud Deploy"
     name: "gcr.io/cloud-builders/gcloud:latest"
     entrypoint: /bin/bash
     args:
-    - "-xe"
-    - "-c"
-    - |
-      gcloud deploy apply --region us-central1 --file clouddeploy.yaml
+      - "-xe"
+      - "-c"
+      - |
+        gcloud deploy apply --region us-central1 --file clouddeploy.yaml
 
   - id: "Clean up: Artifact Registry"
     name: "gcr.io/cloud-builders/gcloud:latest"
     entrypoint: /bin/bash
     args:
-    - "-xe"
-    - "-c"
-    - |
-      gcloud artifacts repositories delete guestbook-remote-repo \
-        --location us-central1 --quiet || echo "Artifact Registry repository does not exist"
-      
-      gcloud artifacts repositories delete guestbook-maven-repo \
-        --location us-central1 --quiet || echo "Artifact Registry repository does not exist"
-      
-      gcloud artifacts repositories delete containers \
-        --location us-central1 --quiet || echo "Artifact Registry repository does not exist"
+      - "-xe"
+      - "-c"
+      - |
+        gcloud artifacts repositories delete guestbook-remote-repo \
+          --location us-central1 --quiet || echo "Artifact Registry repository does not exist"
+
+        gcloud artifacts repositories delete guestbook-maven-repo \
+          --location us-central1 --quiet || echo "Artifact Registry repository does not exist"
+
+        gcloud artifacts repositories delete containers \
+          --location us-central1 --quiet || echo "Artifact Registry repository does not exist"
 
   - id: "Set up: Artifact Registry"
     name: "gcr.io/cloud-builders/gcloud:latest"
     entrypoint: /bin/bash
     args:
-    - "-xe"
-    - "-c"
-    - |
-      gcloud artifacts repositories create guestbook-maven-repo \
-        --repository-format=maven \
-        --location=us-central1 \
-        --description="My Maven repo" 
+      - "-xe"
+      - "-c"
+      - |
+        gcloud artifacts repositories create guestbook-remote-repo \
+          --repository-format=maven \
+          --location=us-central1 \
+          --description="My remote repo" \
+          --mode=remote-repository \
+          --remote-repo-config-desc="Maven Central" \
+          --remote-mvn-repo=MAVEN-CENTRAL
 
-      gcloud artifacts repositories create containers \
-        --repository-format=docker \
-        --location=us-central1 \
-        --description="Docker repository"
+        gcloud artifacts repositories create guestbook-maven-repo \
+          --repository-format=maven \
+          --location=us-central1 \
+          --description="My Maven repo" 
+
+        gcloud artifacts repositories create containers \
+          --repository-format=docker \
+          --location=us-central1 \
+          --description="Docker repository"
 
   - id: "Run Demo Cloud Build"
     name: "gcr.io/cloud-builders/gcloud:latest"
     entrypoint: /bin/bash
     args:
-    - "-c"
-    - |
-      gcloud builds submit --config cloudbuild.yaml \
-        --region us-central1 \
-        --substitutions SHORT_SHA=$SHORT_SHA
+      - "-c"
+      - |
+        gcloud builds submit --config cloudbuild.yaml \
+          --region us-central1 \
+          --substitutions SHORT_SHA=$SHORT_SHA
 
   - id: "Run Integration Tests"
     name: "gcr.io/cloud-builders/mvn:latest"
     args: ["verify", "-Dtest=GuestbookIT", "-pl=backend"]
     env:
-     - "PROJECT_ID=${PROJECT_ID}"
-     - "SHORT_SHA=${SHORT_SHA}"
-     - "TEST_REMOTE_REMOTE=false"
+      - "PROJECT_ID=${PROJECT_ID}"
+      - "SHORT_SHA=${SHORT_SHA}"

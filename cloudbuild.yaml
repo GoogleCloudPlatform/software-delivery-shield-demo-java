@@ -20,20 +20,20 @@ steps:
     name: "gcr.io/cloud-builders/gcloud:latest"
     entrypoint: /bin/bash
     args:
-    - "-xe"
-    - "-c"
-    - |
-      sed -i "s/\/PROJECT_ID/\/\/${PROJECT_ID}\//g" pom.xml **/pom.xml
+      - "-xe"
+      - "-c"
+      - |
+        sed -i "s/\/PROJECT_ID/\/\/${PROJECT_ID}\//g" pom.xml **/pom.xml
 
   - id: "Build Maven Artifact"
     name: "gcr.io/cloud-builders/mvn"
     dir: "guestbook-pojo"
     entrypoint: /bin/bash
     args:
-    - "-xe"
-    - "-c"
-    - |
-      mvn deploy || echo "Artifact may already exist"
+      - "-xe"
+      - "-c"
+      - |
+        mvn deploy || echo "Artifact may already exist"
 
   - id: "Cache Maven Dependencies in an Artifact Registry Remote Repo"
     name: gcr.io/cloud-builders/mvn
@@ -81,8 +81,8 @@ images:
   - $_BACKEND_IMAGE:$SHORT_SHA
 
 substitutions:
-  _FRONTEND_IMAGE: 'us-central1-docker.pkg.dev/${PROJECT_ID}/containers/java-guestbook-frontend'
-  _BACKEND_IMAGE: 'us-central1-docker.pkg.dev/${PROJECT_ID}/containers/java-guestbook-backend'
+  _FRONTEND_IMAGE: "us-central1-docker.pkg.dev/${PROJECT_ID}/containers/java-guestbook-frontend"
+  _BACKEND_IMAGE: "us-central1-docker.pkg.dev/${PROJECT_ID}/containers/java-guestbook-backend"
   _REGION: us-central1
 
 options:
