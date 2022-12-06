@@ -24,8 +24,8 @@ steps:
         sed -i "s/guestbook-maven-repo/cloudrun-guestbook-maven-repo/g" **/pom.xml
         sed -i "s/guestbook-remote-repo/cloudrun-guestbook-remote-repo/g" pom.xml
         # Allow use of remote Maven repository
-        sed -i "s/<\!-- <repositories>/<repositories>/g" pom.xml
-        sed -i "s/<\/repositories> -->/<\/repositories>/g" pom.xml
+        sed -i "s/<\!-- <repository>/<repository>/g" frontend/pom.xml
+        sed -i "s/<\/repository> -->/<\/repository>/g" frontend/pom.xml
 
   - id: "Clean up: Cloud Deploy"
     name: "gcr.io/cloud-builders/gcloud:latest"
