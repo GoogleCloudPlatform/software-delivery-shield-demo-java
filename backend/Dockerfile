@@ -14,7 +14,7 @@
 
 # Use maven to compile the java application.
 # https://hub.docker.com/_/maven
-FROM maven:3-eclipse-temurin-17-alpine AS build-env
+FROM maven:3-eclipse-temurin-19-alpine AS build-env
 
 # Set the working directory to /app
 WORKDIR /app

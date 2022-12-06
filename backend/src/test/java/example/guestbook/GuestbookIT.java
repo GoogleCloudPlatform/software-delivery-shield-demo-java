@@ -71,11 +71,10 @@ public class GuestbookIT {
   public void getDockerImages() throws IOException {
     try (ArtifactRegistryClient artifactRegistryClient = ArtifactRegistryClient.create()) {
       RepositoryName parent = RepositoryName.of(projectId, location, containerRepo);
-      ListDockerImagesPagedResponse response =
-          artifactRegistryClient.listDockerImages(parent.toString());
-      dockerImages =
-          StreamSupport.stream(response.getPage().iterateAll().spliterator(), false)
-              .collect(Collectors.toList());
+      ListDockerImagesPagedResponse response = artifactRegistryClient
+          .listDockerImages(parent.toString());
+      dockerImages = StreamSupport.stream(response.getPage().iterateAll().spliterator(), false)
+          .collect(Collectors.toList());
     }
   }
 
@@ -89,7 +88,7 @@ public class GuestbookIT {
 
   @Test
   public void verifyArtifactRegistry_remote() throws IOException {
-    if (Boolean.valueOf(System.getenv("TEST_REMOTE_REPO"))) {
+    if (Boolean.valueOf(System.getenv().getOrDefault("TEST_REMOTE_REPO", "true"))) {
       try (ArtifactRegistryClient artifactRegistryClient = ArtifactRegistryClient.create()) {
         RepositoryName parent = RepositoryName.of(projectId, location, remoteRepo);
 
@@ -130,9 +129,8 @@ public class GuestbookIT {
 
       while (!finished && !failed && backoffTime < backoffTimeout) {
         finished = rollout.getState() == Rollout.State.SUCCEEDED;
-        failed =
-            rollout.getState() == Rollout.State.FAILED
-                || rollout.getState() == Rollout.State.UNRECOGNIZED;
+        failed = rollout.getState() == Rollout.State.FAILED
+            || rollout.getState() == Rollout.State.UNRECOGNIZED;
 
         if (finished) {
           assertThat(rollout.getState()).isEqualTo(Rollout.State.SUCCEEDED);
@@ -156,15 +154,13 @@ public class GuestbookIT {
     try (ContainerAnalysisClient containerAnalysisClient = ContainerAnalysisClient.create()) {
       GrafeasClient grafeasClient = containerAnalysisClient.getGrafeasClient();
       for (DockerImage dockerImage : dockerImages) {
-        ListOccurrencesPagedResponse occurences =
-            grafeasClient.listOccurrences(
-                ProjectName.of(projectId),
-                String.format(
-                    "resourceUrl=\"https://%s\" AND kind=\"BUILD\"", dockerImage.getUri()));
+        ListOccurrencesPagedResponse occurences = grafeasClient.listOccurrences(
+            ProjectName.of(projectId),
+            String.format("resourceUrl=\"https://%s\" AND kind=\"BUILD\"", dockerImage.getUri()));
 
-        List<Occurrence> occurrenceList =
-            StreamSupport.stream(occurences.getPage().iterateAll().spliterator(), false)
-                .collect(Collectors.toList());
+        List<Occurrence> occurrenceList = StreamSupport
+            .stream(occurences.getPage().iterateAll().spliterator(), false)
+            .collect(Collectors.toList());
         assertThat(occurrenceList.size()).isAtLeast(2);
 
         for (Occurrence imageOccurrence : occurrenceList) {
