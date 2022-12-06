@@ -26,11 +26,11 @@ steps:
         sed -i "s|\/PROJECT_ID\/|\/${PROJECT_ID}\/|g" pom.xml **/pom.xml
 
   - id: "Cache Maven Dependencies in an Artifact Registry Remote Repo"
-    name: gcr.io/cloud-builders/mvn
+    name: "gcr.io/cloud-builders/mvn:latest"
     args: ["compile"]
 
   - id: "Build Maven Artifact"
-    name: "gcr.io/cloud-builders/mvn"
+    name: "gcr.io/cloud-builders/mvn:latest"
     dir: "guestbook-pojo"
     entrypoint: /bin/bash
     args:
@@ -40,7 +40,7 @@ steps:
         mvn deploy || echo "Artifact may already exist"
 
   - id: "Build and Push Container Image: Frontend"
-    name: "gcr.io/cloud-builders/docker"
+    name: "gcr.io/cloud-builders/docker:latest"
     entrypoint: "/bin/bash"
     dir: "frontend"
     args:
@@ -50,7 +50,7 @@ steps:
         docker push $_FRONTEND_IMAGE:$SHORT_SHA
 
   - id: "Build and Push Container Image: Backend"
-    name: "gcr.io/cloud-builders/docker"
+    name: "gcr.io/cloud-builders/docker:latest"
     entrypoint: "/bin/bash"
     dir: "backend"
     args:

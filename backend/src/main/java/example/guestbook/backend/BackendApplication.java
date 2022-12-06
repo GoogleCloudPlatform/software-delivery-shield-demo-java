@@ -19,8 +19,8 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
 /**
- * this class serves as an entry point for the Spring Boot app Here, we check to ensure all required
- * environment variables are set
+ * this class serves as an entry point for the Spring Boot app Here, we check to
+ * ensure all required environment variables are set
  */
 @SpringBootApplication
 @EnableJpaRepositories
