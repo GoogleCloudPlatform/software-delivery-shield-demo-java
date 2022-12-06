@@ -17,10 +17,10 @@ steps:
     name: "gcr.io/cloud-builders/gcloud:latest"
     entrypoint: /bin/bash
     args:
-    - "-xe"
-    - "-c"
-    - |
-      sed -i "s/\/PROJECT_ID/\/\/${PROJECT_ID}\//g" pom.xml **/pom.xml
+      - "-xe"
+      - "-c"
+      - |
+        sed -i "s|\/PROJECT_ID\/|\/${PROJECT_ID}\/|g" pom.xml **/pom.xml
 
   - id: "Run Linter"
     name: "gcr.io/cloud-builders/mvn:latest"
@@ -30,17 +30,17 @@ steps:
     name: "gcr.io/cloud-builders/mvn:latest"
     entrypoint: /bin/bash
     args:
-    - "-xe"
-    - "-c"
-    - |
-      mvn verify -f backend/
-  
+      - "-xe"
+      - "-c"
+      - |
+        mvn verify -f backend/
+
   - id: "Run Unit Tests: Frontend"
     name: "gcr.io/cloud-builders/mvn"
     entrypoint: /bin/bash
     args:
-    - "-xe"
-    - "-c"
-    - |
-      mvn deploy -f guestbook-pojo/ || echo "Artifact may already exist"
-      mvn verify -f frontend/
+      - "-xe"
+      - "-c"
+      - |
+        mvn deploy -f guestbook-pojo/ || echo "Artifact may already exist"
+        mvn verify -f frontend/

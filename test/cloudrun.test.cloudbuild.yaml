@@ -20,7 +20,7 @@ steps:
       - "-xe"
       - "-c"
       - |
-        sed -i "s/\/PROJECT_ID/\/\/${PROJECT_ID}\//g" **/*clouddeploy.yaml clouddeploy.yaml policy.yaml pom.xml
+        sed -i "s|\/PROJECT_ID\/|\/${PROJECT_ID}\/|g" **/*clouddeploy.yaml clouddeploy.yaml policy.yaml pom.xml
         sed -i "s/guestbook-maven-repo/cloudrun-guestbook-maven-repo/g" **/pom.xml
         sed -i "s/guestbook-remote-repo/cloudrun-guestbook-remote-repo/g" pom.xml
         # Allow use of remote Maven repository
@@ -114,7 +114,7 @@ steps:
     args: ["verify", "-Dtest=GuestbookIT", "-pl=backend"]
     env:
       - "PROJECT_ID=${PROJECT_ID}"
-      - "TEST_REMOTE_REMOTE=false"
+      - "TEST_REMOTE_REPO=false"
       - "TEST_MAVEN_REPO=false"
       - "PIPELINE=cloudrun-guestbook-backend-delivery"
       - "CONTAINERS=${_REPOSITORY}"

@@ -58,7 +58,7 @@ steps:
       - "-x"
       - "-c"
       - |
-        sed -i "s/\/PROJECT_ID/\/\/${PROJECT_ID}\//g" clouddeploy.yaml cloudrun.clouddeploy.yaml
+        sed -i "s|\/PROJECT_ID\/|\/${PROJECT_ID}\/|g" clouddeploy.yaml cloudrun.clouddeploy.yaml
         sed -i "s/guestbook-app-delivery/${_GKE_PIPELINE}/g" clouddeploy.yaml
         sed -i "s/cloudrun-guestbook-backend-delivery/${_CLOUDRUN_PIPELINE}/g" cloudrun.clouddeploy.yaml
 
@@ -109,7 +109,7 @@ steps:
       - "PROJECT_ID=${PROJECT_ID}"
       - "SHORT_SHA=${SHORT_SHA}"
       - "TEST_MAVEN_REPO=false"
-      - "TEST_REMOTE_REMOTE=false"
+      - "TEST_REMOTE_REPO=false"
       - "CONTAINERS=${_REPOSITORY}"
       - "PIPELINE=${_GKE_PIPELINE}"
       - "RELEASE_NAME=gke-${BUILD_ID}"
@@ -121,7 +121,7 @@ steps:
       - "PROJECT_ID=${PROJECT_ID}"
       - "SHORT_SHA=${SHORT_SHA}"
       - "TEST_MAVEN_REPO=false"
-      - "TEST_REMOTE_REMOTE=false"
+      - "TEST_REMOTE_REPO=false"
       - "CONTAINERS=${_REPOSITORY}"
       - "PIPELINE=${_CLOUDRUN_PIPELINE}"
       - "RELEASE_NAME=cr-${BUILD_ID}"

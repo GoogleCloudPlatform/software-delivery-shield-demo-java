@@ -20,7 +20,7 @@ steps:
       - "-x"
       - "-c"
       - |
-        sed -i "s/\/PROJECT_ID/\/\/${PROJECT_ID}\//g" **/*clouddeploy.yaml clouddeploy.yaml policy.yaml pom.xml
+        sed -i "s|\/PROJECT_ID\/|\/${PROJECT_ID}\/|g" **/*clouddeploy.yaml clouddeploy.yaml policy.yaml pom.xml
         # Allow use of remote Maven repository
         sed -i "s/<\!-- <repositories>/<repositories>/g" pom.xml
         sed -i "s/<\/repositories> -->/<\/repositories>/g" pom.xml
