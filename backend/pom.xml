@@ -120,7 +120,7 @@
       <plugin>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-maven-plugin</artifactId>
-        <version>3.0.0</version>
+        <version>3.0.2</version>
         <executions>
           <execution>
             <goals>
@@ -135,7 +135,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-checkstyle-plugin</artifactId>
-        <version>3.2.0</version>
+        <version>3.2.1</version>
         <configuration>
           <configLocation>google_checks.xml</configLocation>
         </configuration>
