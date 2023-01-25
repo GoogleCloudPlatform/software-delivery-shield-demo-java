@@ -36,7 +36,7 @@ steps:
       mvn verify -f backend/
   
   - id: "Run Unit Tests: Frontend"
-    name: "gcr.io/cloud-builders/mvn"
+    name: "gcr.io/cloud-builders/mvn:latest"
     entrypoint: /bin/bash
     args:
     - "-xe"
