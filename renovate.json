@@ -6,8 +6,7 @@
         ":ignoreUnstable",
         ":prImmediately",
         ":updateNotScheduled",
-        ":automergeDisabled",
-        ":autodetectRangeStrategy"
+        ":automergeDisabled"
     ],
     "labels": [
         "automerge"
