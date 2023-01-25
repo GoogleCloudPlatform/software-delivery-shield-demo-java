@@ -15,8 +15,6 @@
 package example.guestbook.backend;
 
 import org.springframework.data.repository.CrudRepository;
-import org.springframework.stereotype.Repository;
 
 /** Repository that stores GuestBookEntry objects */
-@Repository
 public interface MessageRepository extends CrudRepository<GuestBookEntry, Long> {}

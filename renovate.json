@@ -1,0 +1,19 @@
+{
+    "extends": [
+        "config:base",
+        ":separateMajorReleases",
+        ":combinePatchMinorReleases",
+        ":ignoreUnstable",
+        ":prImmediately",
+        ":updateNotScheduled",
+        ":automergeDisabled"
+    ],
+    "labels": [
+        "automerge"
+    ],
+    "rebaseWhen": "never",
+    "semanticCommits": "enabled",
+    "schedule": [
+        "before 3am on the first day of the month"
+    ]
+}

@@ -14,10 +14,10 @@
 
 package example.guestbook.backend;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
 
 /** defines the data associated with a single guest book entry */
 @Entity
@@ -54,6 +54,7 @@ public class GuestBookEntry {
     this.date = date;
   }
 
+  @Override
   public String toString() {
     return String.format("Author=%s;Message=%s;Date=%s", this.author, this.message, this.date);
   }
