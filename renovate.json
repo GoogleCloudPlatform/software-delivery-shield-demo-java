@@ -6,35 +6,14 @@
         ":ignoreUnstable",
         ":prImmediately",
         ":updateNotScheduled",
-        ":automergeDisabled",
-        ":autodetectPinVersions"
-    ],
-    "packageRules": [
-        {
-            "packagePatterns": [
-                "*"
-            ],
-            "semanticCommitType": "deps",
-            "semanticCommitScope": null
-        },
-        {
-            "packagePatterns": [
-                "^org.springframework.boot:spring-boot-starter-test"
-            ],
-            "semanticCommitType": "test",
-            "semanticCommitScope": "deps"
-        },
-        {
-            "packagePatterns": [
-                "^com.google.cloud:google-cloud-"
-            ],
-            "ignoreUnstable": false
-        }
+        ":automergeDisabled"
     ],
     "labels": [
         "automerge"
     ],
     "rebaseWhen": "never",
-    "masterIssue": true,
-    "semanticCommits": true
+    "semanticCommits": "enabled",
+    "schedule": [
+        "before 3am on the first day of the month"
+    ]
 }
