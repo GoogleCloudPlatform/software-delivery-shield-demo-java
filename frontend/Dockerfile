@@ -29,7 +29,7 @@ COPY . ./
 RUN mvn package -DskipTests
 
 # Build runtime image.
-FROM eclipse-temurin:17-jre
+FROM eclipse-temurin:17.0.6_10-jre
 
 # Copy the compiled files over.
 COPY --from=build-env /app/target /app/
