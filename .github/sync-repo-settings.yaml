@@ -12,9 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# This file is used in the full demo for the deployment of the Frontend and
-# Backend services to GKE via Cloud Deploy
-
 rebaseMergeAllowed: true
 squashMergeAllowed: true
 mergeCommitAllowed: false
