@@ -37,6 +37,7 @@ steps:
 
   - id: "Cache Maven Dependencies in an Artifact Registry Remote Repo"
     name: "maven:3-eclipse-temurin-17-alpine"
+    entrypoint: mvn
     args: ["compile"]
 
   - id: "Build and Push Container Image: Frontend"

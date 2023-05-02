@@ -24,6 +24,7 @@ steps:
 
   - id: "Run Linter"
     name: "maven:3-eclipse-temurin-17-alpine"
+    entrypoint: mvn
     args: ["checkstyle:check"]
 
   - id: "Run Unit Tests: Backend"

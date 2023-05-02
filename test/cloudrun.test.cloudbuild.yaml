@@ -86,6 +86,7 @@ steps:
 
   - id: "Run Integration Tests: Frontend"
     name: "maven:3-eclipse-temurin-17-alpine"
+    entrypoint: mvn
     args: ["verify", "-Dtest=GuestbookIT", "-pl=backend"]
     env:
      - "PROJECT_ID=${PROJECT_ID}"
@@ -97,6 +98,7 @@ steps:
 
   - id: "Run Integration Tests: Backend"
     name: "maven:3-eclipse-temurin-17-alpine"
+    entrypoint: mvn
     args: ["verify", "-Dtest=GuestbookIT", "-pl=backend"]
     env:
      - "PROJECT_ID=${PROJECT_ID}"

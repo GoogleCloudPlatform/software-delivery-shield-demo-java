@@ -104,6 +104,7 @@ steps:
 
   - id: "Run Integration Tests: GKE"
     name: "maven:3-eclipse-temurin-17-alpine"
+    entrypoint: mvn
     args: ["verify", "-Dtest=GuestbookIT", "-pl=backend"]
     env:
      - "PROJECT_ID=${PROJECT_ID}"
@@ -116,6 +117,7 @@ steps:
 
   - id: "Run Integration Tests: Cloud Run"
     name: "maven:3-eclipse-temurin-17-alpine"
+    entrypoint: mvn
     args: ["verify", "-Dtest=GuestbookIT", "-pl=backend"]
     env:
      - "PROJECT_ID=${PROJECT_ID}"
