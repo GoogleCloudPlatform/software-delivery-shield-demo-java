@@ -85,7 +85,8 @@ steps:
         --substitutions SHORT_SHA=$SHORT_SHA,_BACKEND_IMAGE=us-central1-docker.pkg.dev/${PROJECT_ID}/${_REPOSITORY}/java-guestbook-backend,_FRONTEND_IMAGE=us-central1-docker.pkg.dev/${PROJECT_ID}/${_REPOSITORY}/java-guestbook-frontend
 
   - id: "Run Integration Tests: Frontend"
-    name: "gcr.io/cloud-builders/mvn:latest"
+    name: "maven:3-eclipse-temurin-17-alpine"
+    entrypoint: mvn
     args: ["verify", "-Dtest=GuestbookIT", "-pl=backend"]
     env:
      - "PROJECT_ID=${PROJECT_ID}"
@@ -96,7 +97,8 @@ steps:
      - "RELEASE_NAME=frontend-release-${SHORT_SHA}"
 
   - id: "Run Integration Tests: Backend"
-    name: "gcr.io/cloud-builders/mvn:latest"
+    name: "maven:3-eclipse-temurin-17-alpine"
+    entrypoint: mvn
     args: ["verify", "-Dtest=GuestbookIT", "-pl=backend"]
     env:
      - "PROJECT_ID=${PROJECT_ID}"

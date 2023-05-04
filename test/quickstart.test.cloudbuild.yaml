@@ -103,7 +103,8 @@ steps:
         --images=java-guestbook-backend=us-central1-docker.pkg.dev/${PROJECT_ID}/${_REPOSITORY}/java-guestbook-backend:quickstart
 
   - id: "Run Integration Tests: GKE"
-    name: "gcr.io/cloud-builders/mvn:latest"
+    name: "maven:3-eclipse-temurin-17-alpine"
+    entrypoint: mvn
     args: ["verify", "-Dtest=GuestbookIT", "-pl=backend"]
     env:
      - "PROJECT_ID=${PROJECT_ID}"
@@ -115,7 +116,8 @@ steps:
      - "RELEASE_NAME=gke-${BUILD_ID}"
 
   - id: "Run Integration Tests: Cloud Run"
-    name: "gcr.io/cloud-builders/mvn:latest"
+    name: "maven:3-eclipse-temurin-17-alpine"
+    entrypoint: mvn
     args: ["verify", "-Dtest=GuestbookIT", "-pl=backend"]
     env:
      - "PROJECT_ID=${PROJECT_ID}"

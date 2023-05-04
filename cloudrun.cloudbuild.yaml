@@ -26,11 +26,12 @@ steps:
       sed -i "s/\/PROJECT_ID/\/\/${PROJECT_ID}\//g" pom.xml **/pom.xml
 
   - id: "Cache Maven Dependencies in an Artifact Registry Remote Repo"
-    name: gcr.io/cloud-builders/mvn
+    name: "maven:3-eclipse-temurin-17-alpine"
+    entrypoint: mvn
     args: ["compile"]
 
   - id: "Build Maven Artifact"
-    name: "gcr.io/cloud-builders/mvn:latest"
+    name: "maven:3-eclipse-temurin-17-alpine"
     dir: "guestbook-pojo"
     entrypoint: /bin/bash
     args:

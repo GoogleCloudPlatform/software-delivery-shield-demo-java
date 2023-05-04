@@ -23,11 +23,12 @@ steps:
       sed -i "s/\/PROJECT_ID/\/\/${PROJECT_ID}\//g" pom.xml **/pom.xml
 
   - id: "Run Linter"
-    name: "gcr.io/cloud-builders/mvn:latest"
+    name: "maven:3-eclipse-temurin-17-alpine"
+    entrypoint: mvn
     args: ["checkstyle:check"]
 
   - id: "Run Unit Tests: Backend"
-    name: "gcr.io/cloud-builders/mvn:latest"
+    name: "maven:3-eclipse-temurin-17-alpine"
     entrypoint: /bin/bash
     args:
     - "-xe"
@@ -36,7 +37,7 @@ steps:
       mvn verify -f backend/
   
   - id: "Run Unit Tests: Frontend"
-    name: "gcr.io/cloud-builders/mvn:latest"
+    name: "maven:3-eclipse-temurin-17-alpine"
     entrypoint: /bin/bash
     args:
     - "-xe"
