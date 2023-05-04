@@ -28,12 +28,8 @@ steps:
   - id: "Build Maven Artifact"
     name: "maven:3-eclipse-temurin-17-alpine"
     dir: "guestbook-pojo"
-    entrypoint: /bin/bash
-    args:
-    - "-xe"
-    - "-c"
-    - |
-      mvn deploy || echo "Artifact may already exist"
+    entrypoint: mvn
+    args: ["package"]
 
   - id: "Cache Maven Dependencies in an Artifact Registry Remote Repo"
     name: "maven:3-eclipse-temurin-17-alpine"
@@ -80,6 +76,14 @@ steps:
 images:
   - $_FRONTEND_IMAGE:$SHORT_SHA
   - $_BACKEND_IMAGE:$SHORT_SHA
+
+artifacts:
+  mavenArtifacts:
+  - repository: "https://us-central1-maven.pkg.dev/$PROJECT_ID/guestbook-maven-repo"
+    path: "/workspace/guestbook-pojo/target/java-guestbook-pojo.jar"
+    artifactId: "java-guestbook-pojo"
+    groupId: "com.example.guestbook"
+    version: "1.0"
 
 substitutions:
   _FRONTEND_IMAGE: 'us-central1-docker.pkg.dev/${PROJECT_ID}/containers/java-guestbook-frontend'
