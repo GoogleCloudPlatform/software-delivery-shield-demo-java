@@ -20,7 +20,7 @@ steps:
     - "-x"
     - "-c"
     - |
-      sed -i "s/\/PROJECT_ID/\/\/${PROJECT_ID}\//g" **/*clouddeploy.yaml clouddeploy.yaml policy.yaml **/pom.xml frontend/kubernetes-manifests/*service.yaml
+      sed -i "s/\/PROJECT_ID/\/\/${PROJECT_ID}\//g" **/*clouddeploy.yaml clouddeploy.yaml policy.yaml **/pom.xml pom.xml frontend/kubernetes-manifests/*service.yaml
 
   - id: "Clean up: Cloud Deploy"
     name: "gcr.io/cloud-builders/gcloud:latest"
@@ -69,7 +69,7 @@ steps:
         --repository-format=maven \
         --mode=remote-repository \
         --location=us-central1 \
-        --remote-mvn-repo=MAVEN-CENTRAL
+        --remote-mvn-repo=MAVEN-CENTRAL \
         --description="My Remote repo"
       gcloud artifacts repositories create ${_REPOSITORY} \
         --repository-format=docker \

@@ -16,22 +16,6 @@
     <bootstrap.version>4.2.1</bootstrap.version>
   </properties>
 
-    <!-- Artifact Registry remote repository -->
-    <repositories>
-      <repository>
-        <id>central</id>
-        <name>Maven Central remote repository</name>
-        <url>artifactregistry://us-central1-maven.pkg.dev/PROJECT_ID/guestbook-remote-repo</url>
-        <layout>default</layout>
-        <releases>
-          <enabled>true</enabled>
-        </releases>
-        <snapshots>
-          <enabled>true</enabled>
-        </snapshots>
-      </repository>
-    </repositories>
-
   <!-- Import dependency management from Spring Boot -->
   <dependencyManagement>
     <dependencies>
