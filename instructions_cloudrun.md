@@ -153,7 +153,7 @@ If you want Terraform to __create__ a project within your organization's billing
 
 ## Ship the services
 
-1. Replace PROJECT_ID placeholder with your Project Id
+1. Replace PROJECT_ID placeholder with your project ID
     * MacOS
         ```sh
         sed -i '.bak' "s/PROJECT_ID/$PROJECT_ID/g" **/*clouddeploy.yaml clouddeploy.yaml policy.yaml **/pom.xml pom.xml
@@ -249,7 +249,7 @@ If you want Terraform to __create__ a project within your organization's billing
     gcloud deploy apply --file ./frontend/cloudrun.clouddeploy.yaml
     gcloud deploy apply --file ./backend/cloudrun.clouddeploy.yaml
     ```
-   > **Note:** Ensure clouddeploy.yaml has the correct values. “PROJECT_ID” should have been already replaced with your Project Id
+   > **Note:** Ensure clouddeploy.yaml has the correct values. “PROJECT_ID” should have been already replaced with your project ID
 
 ### Demo
 
