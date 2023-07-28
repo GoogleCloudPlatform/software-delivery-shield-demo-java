@@ -25,7 +25,7 @@ terraform {
       source  = "hashicorp/random"
     }
     time = {
-      version = "~> 3.5.1"
+      version = "~> 0.9.1"
       source  = "hashicorp/time"
     }
   }
@@ -53,7 +53,6 @@ resource "google_project" "generated_project" {
     }
   }
 }
-
 
 provider "google" {
   project = local.final_project_id
@@ -87,8 +86,7 @@ resource "time_sleep" "wait_for_services" {
   depends_on      = [google_project_service.sds_demo_services]
 }
 
-## Artifacts
-
+## Artifact Registry Resources
 resource "google_artifact_registry_repository" "containers" {
   description   = "SDS Java Demo Docker repository"
   format        = "DOCKER"
@@ -96,11 +94,19 @@ resource "google_artifact_registry_repository" "containers" {
   repository_id = "containers"
 }
 
-resource "google_artifact_registry_repository" "guestbook_remote_repo" {
-  description   = "SDS Java Demo remote repo"
+resource "google_artifact_registry_repository" "guestbook_maven_repo" {
+  description   = "SDS Java Demo Maven repo"
   format        = "MAVEN"
+  mode          = "STANDARD_REPOSITORY"
   location      = var.google_cloud_region
   repository_id = "guestbook-maven-repo"
+}
+resource "google_artifact_registry_repository" "guestbook_remote_repo" {
+  description   = "SDS Java Demo Maven repo"
+  format        = "MAVEN"
+  mode          = "REMOTE_REPOSITORY"
+  location      = var.google_cloud_region
+  repository_id = "guestbook-remote-repo"
 }
 
 # Set IAM policy
