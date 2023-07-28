@@ -47,14 +47,12 @@ steps:
     - "-xe"
     - "-c"
     - |
-      gcloud artifacts repositories delete guestbook-remote-repo \
-        --location us-central1 --quiet || echo "Artifact Registry repository does not exist"
-      
-      gcloud artifacts repositories delete guestbook-maven-repo \
-        --location us-central1 --quiet || echo "Artifact Registry repository does not exist"
-      
-      gcloud artifacts repositories delete containers \
-        --location us-central1 --quiet || echo "Artifact Registry repository does not exist"
+      gcloud artifacts repositories delete ${_MAVEN_REPO} \
+        --location us-central1 --quiet || echo "Artifact Registry repository, ${_MAVEN_REPO}, does not exist"
+      gcloud artifacts repositories delete ${_REMOTE_REPO} \
+        --location us-central1 --quiet || echo "Artifact Registry repository, ${_REMOTE_REPO}, does not exist"
+      gcloud artifacts repositories delete ${_REPOSITORY} \
+        --location us-central1 --quiet || echo "Artifact Registry repository, ${_REPOSITORY}, does not exist"
 
   - id: "Set up: Artifact Registry"
     name: "gcr.io/cloud-builders/gcloud:latest"
@@ -63,12 +61,16 @@ steps:
     - "-xe"
     - "-c"
     - |
-      gcloud artifacts repositories create guestbook-maven-repo \
+      gcloud artifacts repositories create ${_MAVEN_REPO} \
         --repository-format=maven \
         --location=us-central1 \
-        --description="My Maven repo" 
-
-      gcloud artifacts repositories create containers \
+        --description="My Maven repo"
+      gcloud artifacts repositories create ${_REMOTE_REPO} \
+        --repository-format=maven \
+        --mode=remote-repository \
+        --location=us-central1 \
+        --description="My Remote repo"
+      gcloud artifacts repositories create ${_REPOSITORY} \
         --repository-format=docker \
         --location=us-central1 \
         --description="Docker repository"
@@ -90,4 +92,10 @@ steps:
     env:
      - "PROJECT_ID=${PROJECT_ID}"
      - "SHORT_SHA=${SHORT_SHA}"
-     - "TEST_REMOTE_REMOTE=false"
+     - "TEST_REMOTE_REMOTE=true"
+     - "TEST_MAVEN_REPO=true"
+
+substitutions:
+  _REPOSITORY: containers
+  _MAVEN_REPO: guestbook-maven-repo
+  _REMOTE_REPO: guestbook-remote-repo
