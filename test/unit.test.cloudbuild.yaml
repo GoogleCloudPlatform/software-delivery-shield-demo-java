@@ -20,7 +20,12 @@ steps:
     - "-xe"
     - "-c"
     - |
-      sed -i "s/\/PROJECT_ID/\/\/${PROJECT_ID}\//g" pom.xml **/pom.xml
+      sed -i "s/\/PROJECT_ID/\/\/${PROJECT_ID}\//g" **/pom.xml
+
+  - id: "Compile dependencies"
+    name: "maven:3-eclipse-temurin-17-alpine"
+    entrypoint: mvn
+    args: ["compile"]
 
   - id: "Run Linter"
     name: "maven:3-eclipse-temurin-17-alpine"
@@ -35,7 +40,7 @@ steps:
     - "-c"
     - |
       mvn verify -f backend/
-  
+
   - id: "Run Unit Tests: Frontend"
     name: "maven:3-eclipse-temurin-17-alpine"
     entrypoint: /bin/bash
