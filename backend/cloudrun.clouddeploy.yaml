@@ -13,7 +13,7 @@
 # limitations under the License.
 
 # This file is used in the full demo and quickstart for the deployment of the 
-# Backend to GKE via Cloud Deploy
+# Backend to Cloud Run via Cloud Deploy
 
 apiVersion: deploy.cloud.google.com/v1
 kind: DeliveryPipeline
