@@ -12,7 +12,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-locals {
-  gen_project_id   = lower(random_id.suffix.b64_url)
-  final_project_id = var.existing_project_id == null ? local.gen_project_id : var.existing_project_id
-}
+steps:
+  - id: "Run Linter"
+    name: "ghcr.io/terraform-linters/tflint"
+    entrypoint: /bin/sh
+    args:
+    - "-xe"
+    - "-c"
+    - |
+      tflint --init
+      tflint --chdir=tf/
+    
