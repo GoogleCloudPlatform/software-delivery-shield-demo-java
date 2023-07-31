@@ -74,8 +74,8 @@ steps:
 
   - id: "Set up: Cloud Deploy"
     name: "gcr.io/cloud-builders/gcloud:latest"
-    entrypoint: /bin/bash
     dir: backend
+    entrypoint: /bin/bash
     args:
     - "-xe"
     - "-c"
@@ -104,8 +104,9 @@ steps:
 
   - id: "Run Integration Tests: GKE"
     name: "maven:3-eclipse-temurin-17-alpine"
+    dir: backend
     entrypoint: mvn
-    args: ["verify", "-Dtest=GuestbookIT", "-pl=backend"]
+    args: ["verify", "-Dtest=GuestbookIT"]
     env:
      - "PROJECT_ID=${PROJECT_ID}"
      - "SHORT_SHA=${SHORT_SHA}"
@@ -117,8 +118,9 @@ steps:
 
   - id: "Run Integration Tests: Cloud Run"
     name: "maven:3-eclipse-temurin-17-alpine"
+    dir: backend
     entrypoint: mvn
-    args: ["verify", "-Dtest=GuestbookIT", "-pl=backend"]
+    args: ["verify", "-Dtest=GuestbookIT"]
     env:
      - "PROJECT_ID=${PROJECT_ID}"
      - "SHORT_SHA=${SHORT_SHA}"

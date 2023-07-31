@@ -24,7 +24,7 @@ steps:
 
   - id: "Compile dependencies"
     name: "maven:3-eclipse-temurin-17-alpine"
-    entrypoint: mvn
+    entrypoint: /bin/bash
     args:
     - "-xe"
     - "-c"

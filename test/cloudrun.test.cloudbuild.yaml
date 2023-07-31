@@ -23,6 +23,7 @@ steps:
       sed -i "s/PROJECT_ID/${PROJECT_ID}/g" **/*clouddeploy.yaml policy.yaml **/pom.xml pom.xml frontend/cloudrun-manifests/*.service.yaml
       sed -i "s/guestbook-maven-repo/${_MAVEN_REPO}/g" frontend/pom.xml
       sed -i "s/guestbook-remote-repo/${_REMOTE_REPO}/g" frontend/pom.xml
+      sed -i "s/guestbook-maven-repo/${_MAVEN_REPO}/g" guestbook-pojo/pom.xml
 
   - id: "Clean up: Cloud Deploy"
     name: "gcr.io/cloud-builders/gcloud:latest"
