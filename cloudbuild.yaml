@@ -23,7 +23,7 @@ steps:
     - "-xe"
     - "-c"
     - |
-      sed -i "s/PROJECT_ID/${PROJECT_ID}/g" *.xml **/*.xml *.yaml **/*.yaml
+      sed -i "s/PROJECT_ID/${PROJECT_ID}/g" pom.xml **/pom.xml
 
   - id: "Build Maven Artifact"
     name: "maven:3-eclipse-temurin-17-alpine"

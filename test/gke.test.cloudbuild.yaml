@@ -20,7 +20,7 @@ steps:
     - "-x"
     - "-c"
     - |
-      sed -i "s/PROJECT_ID/${PROJECT_ID}/g" **/*.yaml *.yaml policy.yaml **/*.xml *.xml frontend/kubernetes-manifests/*service.yaml
+      sed -i "s/PROJECT_ID/${PROJECT_ID}/g" **/*.yaml *.yaml policy.yaml **/*.xml *.xml frontend/cloudrun-manifests/*service.yaml
 
   - id: "Clean up: Cloud Deploy"
     name: "gcr.io/cloud-builders/gcloud:latest"
