@@ -20,17 +20,24 @@ terraform {
       version = "~> 4.36"
       source  = "hashicorp/google"
     }
+    random = {
+      version = "~> 3.5.1"
+      source  = "hashicorp/random"
+    }
+    time = {
+      version = "~> 0.9.1"
+      source  = "hashicorp/time"
+    }
   }
 }
 
 resource "random_id" "suffix" {
-
-  prefix = var.project_name
+  prefix      = var.project_name
   byte_length = 4
 }
 
 resource "google_project" "generated_project" {
-  count           = var.existing_project_id == null ? 1 : 0 #Used to "enable" or "disable" a resource conditionally. This isn't actually used for increasing the quantity of the resource. See https://github.com/hashicorp/terraform/issues/21953 for context.
+  count           = var.existing_project_id == null ? 1 : 0 # Used to "enable" or "disable" a resource conditionally. This isn't actually used for increasing the quantity of the resource. See https://github.com/hashicorp/terraform/issues/21953 for context.
   project_id      = local.gen_project_id
   name            = local.gen_project_id
   billing_account = var.google_billing_account
@@ -47,13 +54,12 @@ resource "google_project" "generated_project" {
   }
 }
 
-
 provider "google" {
   project = local.final_project_id
 }
 
 data "google_project" "project_info" {
-  project_id = local.final_project_id    
+  project_id = local.final_project_id
 }
 
 ## Enable Services
@@ -77,11 +83,10 @@ resource "google_project_service" "sds_demo_services" {
 
 resource "time_sleep" "wait_for_services" {
   create_duration = "300s"
-  depends_on = [google_project_service.sds_demo_services]
+  depends_on      = [google_project_service.sds_demo_services]
 }
 
-## Artifacts
-
+## Artifact Registry Resources
 resource "google_artifact_registry_repository" "containers" {
   description   = "SDS Java Demo Docker repository"
   format        = "DOCKER"
@@ -89,46 +94,54 @@ resource "google_artifact_registry_repository" "containers" {
   repository_id = "containers"
 }
 
-resource "google_artifact_registry_repository" "guestbook_remote_repo" {
-  description   = "SDS Java Demo remote repo"
+resource "google_artifact_registry_repository" "guestbook_maven_repo" {
+  description   = "SDS Java Demo Maven repo"
   format        = "MAVEN"
+  mode          = "STANDARD_REPOSITORY"
   location      = var.google_cloud_region
   repository_id = "guestbook-maven-repo"
+}
+resource "google_artifact_registry_repository" "guestbook_remote_repo" {
+  description   = "SDS Java Demo Maven repo"
+  format        = "MAVEN"
+  mode          = "REMOTE_REPOSITORY"
+  location      = var.google_cloud_region
+  repository_id = "guestbook-remote-repo"
 }
 
 # Set IAM policy
 resource "google_project_iam_member" "cb_deploy_operator" {
   project = local.final_project_id
   role    = "roles/clouddeploy.operator"
-  member  = format("serviceAccount:%d@cloudbuild.gserviceaccount.com", var.existing_project_id == null ? google_project.generated_project.0.number : data.google_project.project_info.number )
+  member  = format("serviceAccount:%d@cloudbuild.gserviceaccount.com", var.existing_project_id == null ? google_project.generated_project[0].number : data.google_project.project_info.number)
 }
 
 resource "google_project_iam_member" "cb_sa_user" {
   project = local.final_project_id
   role    = "roles/iam.serviceAccountUser"
-  member  = format("serviceAccount:%d@cloudbuild.gserviceaccount.com", var.existing_project_id == null ? google_project.generated_project.0.number : data.google_project.project_info.number)
+  member  = format("serviceAccount:%d@cloudbuild.gserviceaccount.com", var.existing_project_id == null ? google_project.generated_project[0].number : data.google_project.project_info.number)
 }
 
 resource "google_project_iam_member" "cb_container_admin" {
   project = local.final_project_id
   role    = "roles/container.admin"
-  member  = format("serviceAccount:%d@cloudbuild.gserviceaccount.com", var.existing_project_id == null ? google_project.generated_project.0.number : data.google_project.project_info.number)
+  member  = format("serviceAccount:%d@cloudbuild.gserviceaccount.com", var.existing_project_id == null ? google_project.generated_project[0].number : data.google_project.project_info.number)
 }
 
 resource "google_project_iam_member" "default_container_dev" {
   project = local.final_project_id
   role    = "roles/container.developer"
-  member  = format("serviceAccount:%d-compute@developer.gserviceaccount.com", var.existing_project_id == null ? google_project.generated_project.0.number : data.google_project.project_info.number)
+  member  = format("serviceAccount:%d-compute@developer.gserviceaccount.com", var.existing_project_id == null ? google_project.generated_project[0].number : data.google_project.project_info.number)
 }
 
 resource "google_project_iam_member" "default_deploy_runner" {
   project = local.final_project_id
   role    = "roles/clouddeploy.jobRunner"
-  member  = format("serviceAccount:%d-compute@developer.gserviceaccount.com", var.existing_project_id == null ? google_project.generated_project.0.number : data.google_project.project_info.number)
+  member  = format("serviceAccount:%d-compute@developer.gserviceaccount.com", var.existing_project_id == null ? google_project.generated_project[0].number : data.google_project.project_info.number)
 }
 
 resource "google_project_iam_member" "default_ar_reader" {
   project = local.final_project_id
   role    = "roles/artifactregistry.reader"
-  member  = format("serviceAccount:%d-compute@developer.gserviceaccount.com", var.existing_project_id == null ? google_project.generated_project.0.number : data.google_project.project_info.number)
+  member  = format("serviceAccount:%d-compute@developer.gserviceaccount.com", var.existing_project_id == null ? google_project.generated_project[0].number : data.google_project.project_info.number)
 }
