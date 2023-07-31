@@ -22,15 +22,19 @@ steps:
     - |
       sed -i "s/PROJECT_ID/${PROJECT_ID}/g" **/pom.xml pom.xml
 
+  - id: "Build Maven Artifact"
+    name: "maven:3-eclipse-temurin-17-alpine"
+    dir: guestbook-pojo
+    entrypoint: /bin/bash
+    args:
+    - "-c"
+    - |
+      mvn deploy || echo "Artifact may already exist"
+
   - id: "Compile dependencies"
     name: "maven:3-eclipse-temurin-17-alpine"
     entrypoint: /bin/bash
-    args:
-    - "-xe"
-    - "-c"
-    - |
-      mvn compile
-      mvn deploy -f guestbook-pojo/ || echo "Artifact may already exist"
+    args: ["compile"]
 
   - id: "Run Linter"
     name: "maven:3-eclipse-temurin-17-alpine"
