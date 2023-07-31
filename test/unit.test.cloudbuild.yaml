@@ -33,7 +33,7 @@ steps:
 
   - id: "Compile dependencies"
     name: "maven:3-eclipse-temurin-17-alpine"
-    entrypoint: /bin/bash
+    entrypoint: mvn
     args: ["compile"]
 
   - id: "Run Linter"
