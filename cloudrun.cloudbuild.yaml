@@ -23,12 +23,7 @@ steps:
     - "-xe"
     - "-c"
     - |
-      sed -i "s/\/PROJECT_ID/\/\/${PROJECT_ID}\//g" pom.xml **/pom.xml
-
-  - id: "Cache Maven Dependencies in an Artifact Registry Remote Repo"
-    name: "maven:3-eclipse-temurin-17-alpine"
-    entrypoint: mvn
-    args: ["compile"]
+      sed -i "s/PROJECT_ID/${PROJECT_ID}/g" pom.xml **/pom.xml frontend/cloudrun-manifests/*.service.yaml
 
   - id: "Build Maven Artifact"
     name: "maven:3-eclipse-temurin-17-alpine"
@@ -40,6 +35,11 @@ steps:
     - |
       mvn deploy || echo "Artifact may already exist"
 
+  - id: "Cache Maven Dependencies in an Artifact Registry Remote Repo"
+    name: "maven:3-eclipse-temurin-17-alpine"
+    entrypoint: mvn
+    args: ["compile"]
+
   - id: "Build and Push Container Image: Frontend"
     name: "gcr.io/cloud-builders/docker:latest"
     entrypoint: "/bin/bash"
@@ -47,7 +47,7 @@ steps:
     args:
       - "-c"
       - |
-        docker build --network=cloudbuild -t $_FRONTEND_IMAGE:$SHORT_SHA . 
+        docker build --network=cloudbuild -t $_FRONTEND_IMAGE:$SHORT_SHA .
         docker push $_FRONTEND_IMAGE:$SHORT_SHA
 
   - id: "Build and Push Container Image: Backend"
@@ -72,7 +72,6 @@ steps:
 
         sed -i "s|BACKEND_DEV|$dev_url|" ./frontend/cloudrun-manifests/guestbook-frontend.dev.service.yaml
         sed -i "s|BACKEND_PROD|$prod_url|" ./frontend/cloudrun-manifests/guestbook-frontend.prod.service.yaml
-        sed -i "s|PROJECT_ID|${PROJECT_ID}|g" ./frontend/cloudrun-manifests/*.yaml
 
         gcloud deploy releases create backend-release-${SHORT_SHA} \
           --region $_REGION \

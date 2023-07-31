@@ -12,13 +12,26 @@
     <maven.compiler.source>17</maven.compiler.source>
     <maven.compiler.target>17</maven.compiler.target>
     <bootstrap.version>4.2.1</bootstrap.version>
+    <project>PROJECT_ID</project>
   </properties>
 
   <!-- Internal dependencies stored in Artifact Registry -->
   <repositories>
     <repository>
       <id>artifact-registry</id>
-      <url>artifactregistry://us-central1-maven.pkg.dev/PROJECT_ID/guestbook-maven-repo</url>
+      <url>artifactregistry://us-central1-maven.pkg.dev/${project}/guestbook-maven-repo</url>
+      <layout>default</layout>
+      <releases>
+        <enabled>true</enabled>
+      </releases>
+      <snapshots>
+        <enabled>true</enabled>
+      </snapshots>
+    </repository>
+    <repository>
+      <id>central</id>
+      <name>Maven Central remote repository</name>
+      <url>artifactregistry://us-central1-maven.pkg.dev/${project}/guestbook-remote-repo</url>
       <layout>default</layout>
       <releases>
         <enabled>true</enabled>
@@ -34,7 +47,7 @@
       <dependency>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-dependencies</artifactId>
-        <version>3.0.6</version>
+        <version>3.1.2</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
@@ -60,7 +73,7 @@
     <dependency>
       <groupId>com.google.auth</groupId>
       <artifactId>google-auth-library-oauth2-http</artifactId>
-      <version>1.15.0</version>
+      <version>1.19.0</version>
     </dependency>
 
     <dependency>
@@ -97,7 +110,7 @@
         <version>3.3.1</version>
         <configuration>
           <to>
-            <image>us-central1-docker.pkg.dev/PROJECT_ID/containers/java-guestbook-frontend:jib</image>
+            <image>us-central1-docker.pkg.dev/${project}/containers/java-guestbook-frontend:jib</image>
           </to>
         </configuration>
       </plugin>

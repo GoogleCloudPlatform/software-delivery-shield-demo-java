@@ -180,11 +180,11 @@ If you want Terraform to __create__ a project within your organization's billing
 1. Replace PROJECT_ID placeholder with your project ID:
     * MacOS
         ```sh
-        sed -i '.bak' "s/PROJECT_ID/$PROJECT_ID/g" **/*clouddeploy.yaml clouddeploy.yaml policy.yaml pom.xml **/pom.xml frontend/kubernetes-manifests/*service.yaml
+        sed -i '.bak' "s/PROJECT_ID/$PROJECT_ID/g" clouddeploy.yaml policy.yaml pom.xml **/pom.xml
         ```
     * Linux
         ```sh
-        sed -i "s/PROJECT_ID/$PROJECT_ID/g" **/*clouddeploy.yaml clouddeploy.yaml policy.yaml pom.xml **/pom.xml frontend/kubernetes-manifests/*service.yaml
+        sed -i "s/PROJECT_ID/$PROJECT_ID/g" clouddeploy.yaml policy.yaml pom.xml **/pom.xml
         ```
 
 1. Set a **[Binary Authorization](https://cloud.google.com/binary-authorization/docs/deploy-cloud-build)** policy:
