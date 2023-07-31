@@ -29,8 +29,8 @@ steps:
     - "-xe"
     - "-c"
     - |
-      mvn deploy -f guestbook-pojo/ || echo "Artifact may already exist"
       mvn compile
+      mvn deploy -f guestbook-pojo/ || echo "Artifact may already exist"
 
   - id: "Run Linter"
     name: "maven:3-eclipse-temurin-17-alpine"
