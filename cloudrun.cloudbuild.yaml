@@ -72,7 +72,6 @@ steps:
 
         sed -i "s|BACKEND_DEV|$dev_url|" ./frontend/cloudrun-manifests/guestbook-frontend.dev.service.yaml
         sed -i "s|BACKEND_PROD|$prod_url|" ./frontend/cloudrun-manifests/guestbook-frontend.prod.service.yaml
-        sed -i "s|PROJECT_ID|${PROJECT_ID}|g" ./frontend/cloudrun-manifests/*.yaml
 
         gcloud deploy releases create backend-release-${SHORT_SHA} \
           --region $_REGION \

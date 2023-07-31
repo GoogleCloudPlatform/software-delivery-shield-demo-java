@@ -17,6 +17,17 @@
 # https://cloud.google.com/software-supply-chain-security/docs/sds/deploy-gke-view-security-insights
 # https://cloud.google.com/software-supply-chain-security/docs/sds/deploy-run-view-security-insights
 steps:
+  - id: "Set up: Project files"
+    name: "gcr.io/cloud-builders/gcloud:latest"
+    entrypoint: /bin/bash
+    args:
+    - "-xe"
+    - "-c"
+    - |
+      sed -i "s/PROJECT_ID/${PROJECT_ID}/g" **/*.yaml *.yaml **/*.xml *.xml
+      sed -i "s/guestbook-app-delivery/${_GKE_PIPELINE}/g" clouddeploy.yaml
+      sed -i "s/cloudrun-guestbook-backend-delivery/${_CLOUDRUN_PIPELINE}/g" cloudrun.clouddeploy.yaml
+
   - id: "Clean up: Artifact Registry"
     name: "gcr.io/cloud-builders/gcloud:latest"
     entrypoint: /bin/bash
@@ -38,18 +49,6 @@ steps:
         --repository-format=docker \
         --location=us-central1 \
         --description="Docker repository"
-
-  - id: "Set up: Project files"
-    name: "gcr.io/cloud-builders/gcloud:latest"
-    entrypoint: /bin/bash
-    dir: backend
-    args:
-    - "-x"
-    - "-c"
-    - |
-      sed -i "s/PROJECT_ID/${PROJECT_ID}/g" clouddeploy.yaml cloudrun.clouddeploy.yaml
-      sed -i "s/guestbook-app-delivery/${_GKE_PIPELINE}/g" clouddeploy.yaml
-      sed -i "s/cloudrun-guestbook-backend-delivery/${_CLOUDRUN_PIPELINE}/g" cloudrun.clouddeploy.yaml
 
   - id: "Run Demo Cloud Build"
     name: "gcr.io/cloud-builders/gcloud:latest"
