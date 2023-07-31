@@ -39,4 +39,11 @@ build/
 
 # OSX
 **/.DS_Store
+*.bak
+
+# Terraform
+tf/plan.out
+tf/.terraform.lock.hcl
+tf/.terraform/
+tf/terraform.tfstate
 
