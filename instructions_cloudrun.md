@@ -1,6 +1,16 @@
-## Deploy on Cloud Run
+# Deploy on Cloud Run
 
-### Before you begin
+## Before you begin
+
+1. Set config for `gcloud`:
+    ```sh
+    export PROJECT_ID=<YOUR_PROJECT_ID>
+
+    gcloud config set deploy/region us-central1
+    gcloud config set artifacts/location us-central1
+    gcloud config set run/region us-central1
+    gcloud config set project $PROJECT_ID
+    ```
 
 1. Download **Cloud Code source protect (Preview)**
 
@@ -8,153 +18,9 @@
    for public access. To get access to this feature, see the
    [access request page][access].
 
-1. You have two options to get things ready:
+1. Choose [Manual setup via `gcloud` commands](#manual-setup) or [Terraform setup](#terraform-setup).
 
-
-    - [Use Terraform to get things setup automatically](#Use-Terraform-to-get-things-setup-automatically)
-
-    __or__
-
-    - [Setup the environment manually](#setup-environment-manually)
-
-### Use Terraform to get things partially setup automatically
-
-1. Setup account info
-
-    -  __(If you don't have an existing project you want to deploy this demo into, skip to the next step)__ If you have an __existing__ project that you want to deploy this demo into, provide it in `deploy-to-cloud-run.tfvars` by un-commenting `existing_project_id`, and replace "sds-java-demo" with the project ID you would like to use.
-
-    __or__
-
-    -  If you want Terraform to __create__ a project for you within your organization's billing account, provide it in `deploy-to-cloud-run.tfvars` by un-commenting `google_billing_account`, and replace "00000-000000-0000" with the billing account number
-
-1. _cd_ into the `tf` folder` and run:
-    ```
-    terraform init
-    ```
-
-1. Next, run a plan to get an idea of the changes that will be applied:
-    ```
-    terraform plan -var-file="deploy-to-gke.tfvars" -out plan.out
-    ```
-
-1. Terraform will then show you a listing of everything that will be deployed. If it all looks good, go ahead and run:
-    ```
-    terraform apply plan.out
-    ```
-
-1. Replace PROJECT_ID placeholder with your Project Id:
-    * MacOS
-        ```sh
-        sed -i '.bak' "s/PROJECT_ID/$PROJECT_ID/g" **/*clouddeploy.yaml policy.yaml pom.xml
-        ```
-    * Linux
-        ```sh
-        sed -i "s/PROJECT_ID/$PROJECT_ID/g" **/*clouddeploy.yaml policy.yaml pom.xml
-        ```
-
-1. Deploy placeholder services:
-
-    1. Deploy placeholder services for the private backend:
-
-        ```sh
-        cd backend
-        gcloud run deploy guestbook-backend-dev \
-            --source . \
-            --no-allow-unauthenticated
-
-        gcloud run deploy guestbook-backend-prod \
-            --source . \
-            --no-allow-unauthenticated
-        cd ..
-        ```
-
-    1. Create a service account for the frontend service to invoke the private backend service:
-
-        ```sh
-        gcloud iam service-accounts create frontend-dev-identity
-        gcloud iam service-accounts create frontend-prod-identity
-
-        gcloud run services add-iam-policy-binding guestbook-backend-dev \
-            --member serviceAccount:frontend-dev-identity@$PROJECT_ID.iam.gserviceaccount.com \
-            --role roles/run.invoker
-
-        gcloud run services add-iam-policy-binding guestbook-backend-prod \
-            --member serviceAccount:frontend-prod-identity@$PROJECT_ID.iam.gserviceaccount.com \
-            --role roles/run.invoker
-        ```
-
-    1. Deploy placeholder services for the public frontend:
-
-        ```sh
-        cd frontend
-        gcloud run deploy guestbook-frontend-dev \
-            --source . \
-            --allow-unauthenticated \
-            --service-account frontend-dev-identity@$PROJECT_ID.iam.gserviceaccount.com
-
-        gcloud run deploy guestbook-frontend-prod \
-            --source . \
-            --allow-unauthenticated \
-            --service-account frontend-prod-identity@$PROJECT_ID.iam.gserviceaccount.com
-        cd ..
-        ```
-
-        **⚠️ Note:** If your organization doesn’t allow public services, the frontend services may error during deployment. Change flag `--allow-unauthenticated` to `--no-allow-unauthenticated`. However, this means your frontend service will need an authentication header to access.
-
-1. Set a **[Binary Authorization](https://cloud.google.com/binary-authorization/docs/deploy-cloud-build)** policy:
-
-    ```sh
-    gcloud container binauthz policy import policy.yaml
-    ```
-
-    **⚠️ Note:** For your project to have the built by Cloud Build attestor, you need to run a build first (see above).
-
-1. Enable **Binary Authorization** on the Cloud Run services:
-
-    ```sh
-    gcloud run services update guestbook-backend-dev --binary-authorization=default
-    gcloud run services update guestbook-frontend-dev --binary-authorization=default
-    gcloud run services update guestbook-backend-prod --binary-authorization=default
-    gcloud run services update guestbook-frontend-prod --binary-authorization=default
-    ```
-1. Create an **Artifact Registry [remote repository](https://cloud.google.com/artifact-registry/docs/repositories/remote-repo) (Preview)**:
-    This feature is not available for public access. To get access to this feature,
-    see the [access request page][access].
-
-    With access uncomment `<repositories>...</repositories>` in [`pom.xml`](./pom.xml).
-
-    ```sh
-    gcloud artifacts repositories create guestbook-remote-repo \
-        --repository-format=maven \
-        --location=us-central1 \
-        --description="My remote repo" \
-        --mode=remote-repository \
-        --remote-repo-config-desc="Maven Central" \
-        --remote-mvn-repo=MAVEN-CENTRAL
-    ```
-
-1. Create your **Cloud Deploy** delivery pipeline and targets:
-
-    ```sh
-    gcloud deploy apply --file ./frontend/cloudrun.clouddeploy.yaml
-    gcloud deploy apply --file ./backend/cloudrun.clouddeploy.yaml
-    ```
-   **⚠️ Note:** Ensure clouddeploy.yaml has the correct values. “PROJECT_ID” should have been already replaced with your Project Id
-
-1. You're ready for the [Demo](#demo)!
-
-### Setup the environment manually
-
-1. Set config for `gcloud`:
-    ```sh
-    export PROJECT_ID=<YOUR_PROJECT_ID>
-    ```
-
-    ```sh
-    gcloud config set deploy/region us-central1
-    gcloud config set artifacts/location us-central1
-    gcloud config set project $PROJECT_ID
-    ```
+### Manual setup
 
 1. Enable APIs:
 
@@ -215,14 +81,86 @@
             --role="roles/iam.serviceAccountUser"
         ```
 
-1. Replace PROJECT_ID placeholder with your Project Id
+1. Create an **Artifact Registry [Docker repository](https://cloud.google.com/artifact-registry/docs/docker)**:
+
+    ```sh
+    gcloud artifacts repositories create containers \
+        --repository-format=docker \
+        --description="Docker repository"
+    ```
+
+1. Create an **Artifact Registry [Maven repository](https://cloud.google.com/artifact-registry/docs/java)**:
+
+    ```sh
+    gcloud artifacts repositories create guestbook-maven-repo \
+        --repository-format=maven \
+        --location=us-central1 \
+        --description="My Maven repo"
+    ```
+
+1. Create an **Artifact Registry [remote repository](https://cloud.google.com/artifact-registry/docs/repositories/remote-repo)**:
+
+    ```sh
+    gcloud artifacts repositories create guestbook-remote-repo \
+        --repository-format=maven \
+        --location=us-central1 \
+        --description="My remote repo" \
+        --mode=remote-repository \
+        --remote-repo-config-desc="Maven Central" \
+        --remote-mvn-repo=MAVEN-CENTRAL
+    ```
+
+### Terraform setup
+
+#### Existing Project
+
+If you want to reuse an __existing__ project, in `deploy-to-cloud-run.tfvars`:
+* Uncomment `existing_project_id`
+* Replace "sds-java-demo" with you project ID
+
+#### New Project
+
+If you want Terraform to __create__ a project within your organization's billing account, in `deploy-to-cloud-run.tfvars`
+* Uncomment `google_billing_account`
+* Replace "00000-000000-0000" with the billing account number
+
+#### Run Terraform
+
+1. Move into the terraform, `tf/`, folder:
+    ```
+    cd tf/
+    ```
+
+1. Prepare the working directory:
+    ```
+    terraform init
+    ```
+
+1. Preview the changes that will be applied:
+    ```
+    terraform plan -var-file="deploy-to-cloud-run.tfvars" -out plan.out
+    ```
+
+1. Terraform will then show you a listing of everything that will be deployed. If it all looks good, go ahead and run:
+    ```
+    terraform apply plan.out
+    ```
+
+1. Move out of the terraform, `tf/`, folder:
+    ```
+    cd ..
+    ```
+
+## Ship the services
+
+1. Replace PROJECT_ID placeholder with your project ID
     * MacOS
         ```sh
-        sed -i '.bak' "s/PROJECT_ID/$PROJECT_ID/g" **/*clouddeploy.yaml clouddeploy.yaml policy.yaml pom.xml
+        sed -i '.bak' "s/PROJECT_ID/$PROJECT_ID/g" **/*clouddeploy.yaml clouddeploy.yaml policy.yaml **/pom.xml pom.xml
         ```
     * Linux
         ```sh
-        sed -i "s/PROJECT_ID/$PROJECT_ID/g" **/*clouddeploy.yaml clouddeploy.yaml policy.yaml pom.xml
+        sed -i "s/PROJECT_ID/$PROJECT_ID/g" **/*clouddeploy.yaml clouddeploy.yaml policy.yaml **/pom.xml pom.xml
         ```
 
 1. Deploy placeholder services:
@@ -275,19 +213,18 @@
         ```sh
         cd frontend
         gcloud run deploy guestbook-frontend-dev \
-            --source . \
+            --image gcr.io/cloudrun/hello \
             --allow-unauthenticated \
             --service-account frontend-dev-identity@$PROJECT_ID.iam.gserviceaccount.com
 
         gcloud run deploy guestbook-frontend-prod \
-            --source . \
+            --image gcr.io/cloudrun/hello \
             --allow-unauthenticated \
             --service-account frontend-prod-identity@$PROJECT_ID.iam.gserviceaccount.com
         cd ..
         ```
 
-        **⚠️ Note:** If your organization doesn’t allow public services, the frontend services may error during deployment. Change flag `--allow-unauthenticated` to `--no-allow-unauthenticated`. However, this means your frontend service will need an authentication header to access.
-
+        > **Note:** If your organization doesn’t allow public services, the frontend services may error during deployment. Change flag `--allow-unauthenticated` to `--no-allow-unauthenticated`. However, this means your frontend service will need an authentication header to access.
 
 1. Set a **[Binary Authorization](https://cloud.google.com/binary-authorization/docs/deploy-cloud-build)** policy:
 
@@ -295,7 +232,7 @@
     gcloud container binauthz policy import policy.yaml
     ```
 
-    **⚠️ Note:** For your project to have the built by Cloud Build attestor, you need to run a build first (see above).
+    > **Note:** For your project to have the built by Cloud Build attestor, you need to run a build first (see above).
 
 1. Enable **Binary Authorization** on the Cloud Run services:
 
@@ -306,47 +243,13 @@
     gcloud run services update guestbook-frontend-prod --binary-authorization=default
     ```
 
-1. Create an **Artifact Registry [Docker repository](https://cloud.google.com/artifact-registry/docs/docker)**:
-
-    ```sh
-    gcloud artifacts repositories create containers \
-        --repository-format=docker \
-        --description="Docker repository"
-    ```
-
-1. Create an **Artifact Registry [Maven repository](https://cloud.google.com/artifact-registry/docs/java)**:
-
-    ```sh
-    gcloud artifacts repositories create guestbook-maven-repo \
-        --repository-format=maven \
-        --location=us-central1 \
-        --description="My Maven repo"
-    ```
-
-1. Create an **Artifact Registry [remote repository](https://cloud.google.com/artifact-registry/docs/repositories/remote-repo) (Preview)**:
-    This feature is not available for public access. To get access to this feature,
-    see the [access request page][access].
-
-    With access uncomment `<repositories>...</repositories>` in [`pom.xml`](./pom.xml).
-
-    ```sh
-    gcloud artifacts repositories create guestbook-remote-repo \
-        --repository-format=maven \
-        --location=us-central1 \
-        --description="My remote repo" \
-        --mode=remote-repository \
-        --remote-repo-config-desc="Maven Central" \
-        --remote-mvn-repo=MAVEN-CENTRAL
-    ```
-
 1. Create your **Cloud Deploy** delivery pipeline and targets:
 
     ```sh
     gcloud deploy apply --file ./frontend/cloudrun.clouddeploy.yaml
     gcloud deploy apply --file ./backend/cloudrun.clouddeploy.yaml
     ```
-   **⚠️ Note:** Ensure clouddeploy.yaml has the correct values. “PROJECT_ID” should have been already replaced with your Project Id
-
+   > **Note:** Ensure clouddeploy.yaml has the correct values. “PROJECT_ID” should have been already replaced with your project ID
 
 ### Demo
 
@@ -362,13 +265,13 @@
 
     The build does the following:
 
-    * Caches dependency artifacts into an **Artifact Registry remote repo** ([request access][access]). The first time that you request a version of a package, Artifact Registry downloads and caches the package in the remote repository. The next time you request the same package version, Artifact Registry serves the cached copy.
+    * Caches dependency artifacts into an **Artifact Registry remote repo**. The first time that you request a version of a package, Artifact Registry downloads and caches the package in the remote repository. The next time you request the same package version, Artifact Registry serves the cached copy.
     * Builds and stores a Java dependency artifacts to Artifact Registry
-    * Builds and push containers to Artifact Registry, where **[Container Analysis](https://cloud.google.com/container-analysis/docs/container-analysis)** provides integrated on-demand or automated scanning for base container images, Maven & Go packages in containers, and for non-containerized Maven packages.
+    * Builds and push containers to Artifact Registry, where **[Artifact Analysis](https://cloud.google.com/artifact-analysis/docs/artifact-analysis)** provides integrated on-demand or automated scanning for base container images, Maven & Go packages in containers, and for non-containerized Maven packages.
     * Automatically signs the artifacts with the attestor: [“built-with-cloud-build”](https://cloud.google.com/binary-authorization/docs/deploy-cloud-build)
     * Creates a release via Cloud Deploy
 
-1. View artifacts cached in the **Artifact Registry remote repository** ([request access][access]):
+1. View artifacts cached in the **Artifact Registry remote repository**:
 
     ```sh
     gcloud artifacts files list --repository=guestbook-remote-repo
@@ -380,14 +283,13 @@
     gcloud artifacts packages list --repository=guestbook-maven-repo --location=us-central1
     ```
 
-
 1. View the container vulnerabilities, dependencies, and provenance via Cloud Build:
     * Open the [Cloud Build console](https://console.cloud.google.com/cloud-build/builds)
     * Click on the build ID to view the build
     * Click the "Build Artifacts" tab
     * Click "View" under ["Security Insights"](https://cloud.google.com/software-supply-chain-security/docs/sds/build-view-security-insights)
         * Cloud Build supports [SLSA Level 3 builds for container images](https://cloud.google.com/build/docs/securing-builds/view-build-provenance) and generates authenticated and non-falsifiable [build provenance](https://cloud.google.com/build/docs/securing-builds/view-build-provenance) for containerized applications.
-        * Container Analysis provides standalone scanning (Preview) that identifies existing vulnerabilities and new vulnerabilities within the open source dependencies used by your Maven artifacts. This feature is not available for public access. To get access to this feature, see the [access request page][access].
+        * Artifact Analysis provides standalone scanning that identifies existing vulnerabilities and new vulnerabilities within the open source dependencies used by your Maven artifacts.
     * Click on "Artifacts scanned" to view vulnerabilities in Artifact Registry
 
 1. View **[Cloud Run Security](https://cloud.devsite.corp.google.com/software-supply-chain-security/docs/sds/deploy-run-view-security-insights)** insights:

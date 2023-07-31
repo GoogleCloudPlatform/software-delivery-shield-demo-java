@@ -113,7 +113,7 @@
         <configuration>
           <to>
             <image>
-              us-central1-docker.pkg.dev/${env.PROJECT_ID}/containers/java-guestbook-backend:jib</image>
+              us-central1-docker.pkg.dev/PROJECT_ID/containers/java-guestbook-backend:jib</image>
           </to>
         </configuration>
       </plugin>
