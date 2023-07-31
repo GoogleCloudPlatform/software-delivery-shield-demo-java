@@ -19,12 +19,13 @@
 steps:
   - id: "Set up: Project files"
     name: "gcr.io/cloud-builders/gcloud:latest"
+    dir: backend
     entrypoint: /bin/bash
     args:
     - "-xe"
     - "-c"
     - |
-      sed -i "s/PROJECT_ID/${PROJECT_ID}/g" **/*.yaml *.yaml **/*.xml *.xml
+      sed -i "s/PROJECT_ID/${PROJECT_ID}/g" **clouddeploy.yaml pom.xml
       sed -i "s/guestbook-app-delivery/${_GKE_PIPELINE}/g" clouddeploy.yaml
       sed -i "s/cloudrun-guestbook-backend-delivery/${_CLOUDRUN_PIPELINE}/g" cloudrun.clouddeploy.yaml
 

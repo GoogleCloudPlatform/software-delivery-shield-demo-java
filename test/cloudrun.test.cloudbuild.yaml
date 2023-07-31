@@ -20,7 +20,7 @@ steps:
     - "-xe"
     - "-c"
     - |
-      sed -i "s/PROJECT_ID/${PROJECT_ID}/g" **/*.yaml *.yaml **/*.xml *.xml
+      sed -i "s/PROJECT_ID/${PROJECT_ID}/g" **/*clouddeploy.yaml policy.yaml **/pom.xml pom.xml frontend/cloudrun-manifests/*.service.yaml
       sed -i "s/guestbook-maven-repo/${_MAVEN_REPO}/g" frontend/pom.xml
       sed -i "s/guestbook-remote-repo/${_REMOTE_REPO}/g" frontend/pom.xml
 

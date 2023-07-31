@@ -25,7 +25,12 @@ steps:
   - id: "Compile dependencies"
     name: "maven:3-eclipse-temurin-17-alpine"
     entrypoint: mvn
-    args: ["compile"]
+    args:
+    - "-xe"
+    - "-c"
+    - |
+      mvn deploy -f guestbook-pojo/ || echo "Artifact may already exist"
+      mvn compile
 
   - id: "Run Linter"
     name: "maven:3-eclipse-temurin-17-alpine"
@@ -48,5 +53,4 @@ steps:
     - "-xe"
     - "-c"
     - |
-      mvn deploy -f guestbook-pojo/ || echo "Artifact may already exist"
       mvn verify -f frontend/
