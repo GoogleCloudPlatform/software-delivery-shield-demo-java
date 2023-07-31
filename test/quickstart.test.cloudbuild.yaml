@@ -47,7 +47,7 @@ steps:
     - "-x"
     - "-c"
     - |
-      sed -i "s/\/PROJECT_ID/\/\/${PROJECT_ID}\//g" clouddeploy.yaml cloudrun.clouddeploy.yaml
+      sed -i "s/PROJECT_ID/${PROJECT_ID}/g" clouddeploy.yaml cloudrun.clouddeploy.yaml
       sed -i "s/guestbook-app-delivery/${_GKE_PIPELINE}/g" clouddeploy.yaml
       sed -i "s/cloudrun-guestbook-backend-delivery/${_CLOUDRUN_PIPELINE}/g" cloudrun.clouddeploy.yaml
 

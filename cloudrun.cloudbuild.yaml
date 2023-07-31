@@ -23,7 +23,7 @@ steps:
     - "-xe"
     - "-c"
     - |
-      sed -i "s/\/PROJECT_ID/\/\/${PROJECT_ID}\//g" pom.xml **/pom.xml
+      sed -i "s/PROJECT_ID/${PROJECT_ID}/g" pom.xml **/pom.xml
 
   - id: "Cache Maven Dependencies in an Artifact Registry Remote Repo"
     name: "maven:3-eclipse-temurin-17-alpine"
@@ -47,7 +47,7 @@ steps:
     args:
       - "-c"
       - |
-        docker build --network=cloudbuild -t $_FRONTEND_IMAGE:$SHORT_SHA . 
+        docker build --network=cloudbuild -t $_FRONTEND_IMAGE:$SHORT_SHA .
         docker push $_FRONTEND_IMAGE:$SHORT_SHA
 
   - id: "Build and Push Container Image: Backend"
