@@ -31,11 +31,6 @@ steps:
     - |
       mvn deploy || echo "Artifact may already exist"
 
-  - id: "Compile dependencies"
-    name: "maven:3-eclipse-temurin-17-alpine"
-    entrypoint: mvn
-    args: ["compile"]
-
   - id: "Run Linter"
     name: "maven:3-eclipse-temurin-17-alpine"
     entrypoint: mvn
