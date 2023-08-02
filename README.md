@@ -1,21 +1,14 @@
 # Software Delivery Shield Demo for Java
 
-This sample demonstrates security features for an end to end Java workflow. 
-This samples deploys a multi-tiered application with a frontend service and 
+This sample demonstrates security features for an end to end Java workflow.
+This samples deploys a multi-tiered application with a frontend service and
 a backend service to Google Kubernetes Engine or Cloud Run using Cloud Deploy.
 
-> **🧪 Preview:** This product or feature is covered by the
-[Pre-GA Offerings Terms](https://cloud.devsite.corp.google.com/terms/service-terms#1) of the Google Cloud
-Terms of Service. Pre-GA products and features might have limited support, and changes to
-pre-GA products and features might not be compatible with other pre-GA versions.
-For more information, see the [launch stage descriptions](https://cloud.devsite.corp.google.com/products#product-launch-stages).
-
-Some features are not available for public access. To get access to these features, 
-see the [access request page](https://docs.google.com/forms/d/e/1FAIpQLSeBUSpLmXsvGhnKfYx7g-Cmd-oth9yXbUTZNFIL87cdGIu2RQ/viewform?resourcekey=0-tR1FN8wQtdR43sJixQL3jw).
+> **⚠️ WARNING:** This demo includes a vulnerable dependency in [backend/pom.xml](./backend/pom.xml) for illustrative purposes!
 
 ## Demo Instructions
 
-[Deploy to GKE](./instructions_gke.md)  
+[Deploy to GKE](./instructions_gke.md)
 [Deploy to Cloud Run](./instructions_cloudrun.md)
 
 ### Pre-Reqs
@@ -24,7 +17,7 @@ The permissions needed for these tutorials can be fulfilled by the [Owner or Edi
 > **Note:** [Organization](https://cloud.google.com/resource-manager/docs/organization-policy/overview) or [Binary Authorization](https://cloud.google.com/binary-authorization/docs/key-concepts#policies) policies may already be set for your organization and may cause deployment errors.
 
 You will need:
-* To create or select a [Google Cloud project](https://cloud.google.com/resource-manager/docs/creating-managing-projects). 
+* To create or select a [Google Cloud project](https://cloud.google.com/resource-manager/docs/creating-managing-projects).
 
   > **Note:** If you don't plan to keep the resources that you create in this procedure, create a project instead of selecting an existing project. After you finish these steps, you can delete the project, removing all resources associated with the project.
 
