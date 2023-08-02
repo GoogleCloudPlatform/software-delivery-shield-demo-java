@@ -13,7 +13,7 @@
     <module>guestbook-pojo</module>
   </modules>
 
-  <!-- Artifact Registry remote repository -->
+
 
   <build>
     <pluginManagement>
