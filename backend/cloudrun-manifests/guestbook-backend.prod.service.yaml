@@ -16,8 +16,8 @@ apiVersion: serving.knative.dev/v1
 kind: Service
 metadata:
   name: guestbook-backend-prod
-annotations:
-  run.googleapis.com/binary-authorization: default
+  annotations:
+    run.googleapis.com/binary-authorization: default
 spec:
   template:
     spec:
