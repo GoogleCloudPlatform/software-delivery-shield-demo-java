@@ -13,21 +13,7 @@
     <module>guestbook-pojo</module>
   </modules>
 
-  <!-- Artifact Registry remote repository -->
-  <!-- <repositories>
-    <repository>
-      <id>central</id>
-      <name>Maven Central remote repository</name>
-      <url>artifactregistry://us-central1-maven.pkg.dev/PROJECT_ID/guestbook-remote-repo</url>
-      <layout>default</layout>
-      <releases>
-        <enabled>true</enabled>
-      </releases>
-      <snapshots>
-        <enabled>true</enabled>
-      </snapshots>
-    </repository>
-  </repositories> -->
+
 
   <build>
     <pluginManagement>
@@ -35,12 +21,12 @@
         <plugin>
           <groupId>com.google.cloud.tools</groupId>
           <artifactId>jib-maven-plugin</artifactId>
-          <version>3.3.1</version>
+          <version>3.3.2</version>
         </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-surefire-plugin</artifactId>
-          <version>3.0.0-M8</version>
+          <version>3.1.2</version>
           <dependencies>
             <dependency>
               <groupId>org.junit.jupiter</groupId>
@@ -52,7 +38,7 @@
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-checkstyle-plugin</artifactId>
-          <version>3.2.1</version>
+          <version>3.3.0</version>
           <dependencies>
             <dependency>
               <groupId>com.puppycrawl.tools</groupId>
