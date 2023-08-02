@@ -156,11 +156,11 @@ If you want Terraform to __create__ a project within your organization's billing
 1. Replace PROJECT_ID placeholder with your project ID
     * MacOS
         ```sh
-        sed -i '.bak' "s/PROJECT_ID/$PROJECT_ID/g" **/*clouddeploy.yaml clouddeploy.yaml policy.yaml **/pom.xml pom.xml
+        sed -i '.bak' "s/PROJECT_ID/$PROJECT_ID/g" **/*clouddeploy.yaml policy.yaml **/pom.xml pom.xml frontend/cloudrun-manifests/*.service.yaml
         ```
     * Linux
         ```sh
-        sed -i "s/PROJECT_ID/$PROJECT_ID/g" **/*clouddeploy.yaml clouddeploy.yaml policy.yaml **/pom.xml pom.xml
+        sed -i "s/PROJECT_ID/$PROJECT_ID/g" **/*clouddeploy.yaml policy.yaml **/pom.xml pom.xml frontend/cloudrun-manifests/*.service.yaml
         ```
 
 1. Deploy placeholder services:

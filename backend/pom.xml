@@ -14,8 +14,8 @@
     <maven.compiler.source>17</maven.compiler.source>
     <maven.compiler.target>17</maven.compiler.target>
     <bootstrap.version>4.2.1</bootstrap.version>
+    <project>PROJECT_ID</project>
   </properties>
-
 
   <!-- Import dependency management from Spring Boot -->
   <dependencyManagement>
@@ -113,7 +113,7 @@
         <configuration>
           <to>
             <image>
-              us-central1-docker.pkg.dev/PROJECT_ID/containers/java-guestbook-backend:jib</image>
+              us-central1-docker.pkg.dev/${project}/containers/java-guestbook-backend:jib</image>
           </to>
         </configuration>
       </plugin>

@@ -20,9 +20,10 @@ steps:
     - "-xe"
     - "-c"
     - |
-      sed -i "s/\/PROJECT_ID/\/\/${PROJECT_ID}\//g" **/*clouddeploy.yaml clouddeploy.yaml policy.yaml pom.xml
-      sed -i "s/guestbook-maven-repo/cloudrun-guestbook-maven-repo/g" **/pom.xml
-      sed -i "s/guestbook-remote-repo/cloudrun-guestbook-remote-repo/g" pom.xml
+      sed -i "s/PROJECT_ID/${PROJECT_ID}/g" **/*clouddeploy.yaml policy.yaml **/pom.xml pom.xml frontend/cloudrun-manifests/*.service.yaml
+      sed -i "s/guestbook-maven-repo/${_MAVEN_REPO}/g" frontend/pom.xml
+      sed -i "s/guestbook-remote-repo/${_REMOTE_REPO}/g" frontend/pom.xml
+      sed -i "s/guestbook-maven-repo/${_MAVEN_REPO}/g" guestbook-pojo/pom.xml
 
   - id: "Clean up: Cloud Deploy"
     name: "gcr.io/cloud-builders/gcloud:latest"
@@ -52,10 +53,11 @@ steps:
     - "-c"
     - |
       gcloud artifacts repositories delete ${_MAVEN_REPO} \
-        --location us-central1 --quiet || echo "Artifact Registry repository does not exist"
-      
+        --location us-central1 --quiet || echo "Artifact Registry repository, ${_MAVEN_REPO}, does not exist"
+      gcloud artifacts repositories delete ${_REMOTE_REPO} \
+        --location us-central1 --quiet || echo "Artifact Registry repository, ${_REMOTE_REPO}, does not exist"
       gcloud artifacts repositories delete ${_REPOSITORY} \
-        --location us-central1 --quiet || echo "Artifact Registry repository does not exist"
+        --location us-central1 --quiet || echo "Artifact Registry repository, ${_REPOSITORY}, does not exist"
 
   - id: "Set up: Artifact Registry"
     name: "gcr.io/cloud-builders/gcloud:latest"
@@ -67,8 +69,13 @@ steps:
       gcloud artifacts repositories create ${_MAVEN_REPO} \
         --repository-format=maven \
         --location=us-central1 \
-        --description="My Maven repo" 
-
+        --description="My Maven repo"
+      gcloud artifacts repositories create ${_REMOTE_REPO} \
+        --repository-format=maven \
+        --mode=remote-repository \
+        --location=us-central1 \
+        --remote-mvn-repo=MAVEN-CENTRAL \
+        --description="My Remote repo"
       gcloud artifacts repositories create ${_REPOSITORY} \
         --repository-format=docker \
         --location=us-central1 \
@@ -87,10 +94,11 @@ steps:
   - id: "Run Integration Tests: Frontend"
     name: "maven:3-eclipse-temurin-17-alpine"
     entrypoint: mvn
-    args: ["verify", "-Dtest=GuestbookIT", "-pl=backend"]
+    args: ["verify", "-Dtest=GuestbookIT", "-pl=backend"] # IT tests are in backend project
     env:
      - "PROJECT_ID=${PROJECT_ID}"
      - "TEST_REMOTE_REMOTE=false"
+     - "TEST_MAVEN_REPO=true"
      - "PIPELINE=cloudrun-guestbook-frontend-delivery"
      - "MAVEN_REPO=${_MAVEN_REPO}"
      - "CONTAINERS=${_REPOSITORY}"
@@ -102,7 +110,7 @@ steps:
     args: ["verify", "-Dtest=GuestbookIT", "-pl=backend"]
     env:
      - "PROJECT_ID=${PROJECT_ID}"
-     - "TEST_REMOTE_REMOTE=false"
+     - "TEST_REMOTE_REMOTE=true"
      - "TEST_MAVEN_REPO=false"
      - "PIPELINE=cloudrun-guestbook-backend-delivery"
      - "CONTAINERS=${_REPOSITORY}"
@@ -111,3 +119,4 @@ steps:
 substitutions:
   _REPOSITORY: cloudrun-containers
   _MAVEN_REPO: cloudrun-guestbook-maven-repo
+  _REMOTE_REPO: cloudrun-guestbook-remote-repo

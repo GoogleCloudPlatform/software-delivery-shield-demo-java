@@ -17,6 +17,18 @@
 # https://cloud.google.com/software-supply-chain-security/docs/sds/deploy-gke-view-security-insights
 # https://cloud.google.com/software-supply-chain-security/docs/sds/deploy-run-view-security-insights
 steps:
+  - id: "Set up: Project files"
+    name: "gcr.io/cloud-builders/gcloud:latest"
+    dir: backend
+    entrypoint: /bin/bash
+    args:
+    - "-xe"
+    - "-c"
+    - |
+      sed -i "s/PROJECT_ID/${PROJECT_ID}/g" **clouddeploy.yaml pom.xml
+      sed -i "s/guestbook-app-delivery/${_GKE_PIPELINE}/g" clouddeploy.yaml
+      sed -i "s/cloudrun-guestbook-backend-delivery/${_CLOUDRUN_PIPELINE}/g" cloudrun.clouddeploy.yaml
+
   - id: "Clean up: Artifact Registry"
     name: "gcr.io/cloud-builders/gcloud:latest"
     entrypoint: /bin/bash
@@ -38,7 +50,7 @@ steps:
         --repository-format=docker \
         --location=us-central1 \
         --description="Docker repository"
-      
+
   - id: "Run Demo Cloud Build"
     name: "gcr.io/cloud-builders/gcloud:latest"
     dir: backend
@@ -49,18 +61,6 @@ steps:
       gcloud builds submit --config cloudbuild.yaml \
         --region us-central1 \
         --substitutions _BACKEND_IMAGE=us-central1-docker.pkg.dev/${PROJECT_ID}/$_REPOSITORY/java-guestbook-backend:quickstart
-
-  - id: "Set up: Project files"
-    name: "gcr.io/cloud-builders/gcloud:latest"
-    entrypoint: /bin/bash
-    dir: backend
-    args:
-    - "-x"
-    - "-c"
-    - |
-      sed -i "s/\/PROJECT_ID/\/\/${PROJECT_ID}\//g" clouddeploy.yaml cloudrun.clouddeploy.yaml
-      sed -i "s/guestbook-app-delivery/${_GKE_PIPELINE}/g" clouddeploy.yaml
-      sed -i "s/cloudrun-guestbook-backend-delivery/${_CLOUDRUN_PIPELINE}/g" cloudrun.clouddeploy.yaml
 
   - id: "Clean up: Cloud Deploy"
     name: "gcr.io/cloud-builders/gcloud:latest"
@@ -74,8 +74,8 @@ steps:
 
   - id: "Set up: Cloud Deploy"
     name: "gcr.io/cloud-builders/gcloud:latest"
-    entrypoint: /bin/bash
     dir: backend
+    entrypoint: /bin/bash
     args:
     - "-xe"
     - "-c"
@@ -104,8 +104,9 @@ steps:
 
   - id: "Run Integration Tests: GKE"
     name: "maven:3-eclipse-temurin-17-alpine"
+    dir: backend
     entrypoint: mvn
-    args: ["verify", "-Dtest=GuestbookIT", "-pl=backend"]
+    args: ["verify", "-Dtest=GuestbookIT"]
     env:
      - "PROJECT_ID=${PROJECT_ID}"
      - "SHORT_SHA=${SHORT_SHA}"
@@ -117,8 +118,9 @@ steps:
 
   - id: "Run Integration Tests: Cloud Run"
     name: "maven:3-eclipse-temurin-17-alpine"
+    dir: backend
     entrypoint: mvn
-    args: ["verify", "-Dtest=GuestbookIT", "-pl=backend"]
+    args: ["verify", "-Dtest=GuestbookIT"]
     env:
      - "PROJECT_ID=${PROJECT_ID}"
      - "SHORT_SHA=${SHORT_SHA}"
