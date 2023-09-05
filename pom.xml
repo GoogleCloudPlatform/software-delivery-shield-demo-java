@@ -13,8 +13,6 @@
     <module>guestbook-pojo</module>
   </modules>
 
-
-
   <build>
     <pluginManagement>
       <plugins>
